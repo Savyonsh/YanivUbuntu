@@ -82,9 +82,6 @@ namespace YanivUbuntu
             graphics.ApplyChanges();
             this.IsMouseVisible = true;
             deck = new byte[54];
-            /*players[1] = new Player(1, "Sharon");
-            players[2] = new Player(2, "Sharon");
-            players[0] = new Player(0, "Sharon");*/
             players = new List<Player>
             {
                 new Player(0, ""),
@@ -94,11 +91,7 @@ namespace YanivUbuntu
             random = new Random();
             tableCards = new List<Card>();
             thrownCards = new List<Card>();
-            playersCardsVectors = new List<Vector2[]>();
-            playersCardsVectors.Add(new Vector2[7]);
-            playersCardsVectors.Add(new Vector2[7]);
-            /*playersCardsVectors[0] = ;
-            playersCardsVectors[0] = new Vector2[7];*/
+            playersCardsVectors = new List<Vector2[]> {new Vector2[7], new Vector2[7]};
             startGame = false;
             roundNumber = 0;
             numOfPlayers = 0;
@@ -728,7 +721,7 @@ namespace YanivUbuntu
                 }
 
                 // Cards mouse hover animation
-                foreach (Card card in players[0].Cards)
+                foreach (var card in players[0].Cards)
                 {
                     if (card.MouseHovered(mouseCurrent) && card.CardState != CardState.LIFT)
                     {
@@ -891,6 +884,10 @@ namespace YanivUbuntu
         }
         private void ReplaceTableCards(List<Card> cards)
         {
+            // Fix joker value, if exists
+            foreach (var card in cards.Where(card => card.CardShape == Shapes.JOKER))
+                card.CardValue = 0;
+            
             var arrayTableCards = cards.ToArray();
             var middle = cards.Count % 2 == 0 ? cards.Count / 2 : (cards.Count - 1) / 2;
             arrayTableCards[middle].spriteVector.X = 310;
@@ -929,42 +926,6 @@ namespace YanivUbuntu
                         series = betterSeries;
                 }
             }
-            /*
-            if (player.DiamondCards.Count >= 3 || player.JokerCards.Count > 0 && player.DiamondCards.Count >= 2)
-            {
-                if(series.Count < 3)
-                    series = CheckSeries(player.DiamondCards, player.JokerCards);
-                else
-                {
-                    List<Card> betterSeries = CheckSeries(player.DiamondCards, player.JokerCards);
-                    if (Card.CardSum(series) < Card.CardSum(betterSeries))
-                        series = betterSeries;
-                }
-            }
-            if (player.HeartsCards.Count >= 3 || player.JokerCards.Count > 0 && player.HeartsCards.Count >= 2)
-            {
-                if(series.Count < 3)
-                    series = CheckSeries(player.HeartsCards, player.JokerCards);
-                else
-                {
-                    List<Card> betterSeries = CheckSeries(player.HeartsCards, player.JokerCards);
-                    if (Card.CardSum(series) < Card.CardSum(betterSeries))
-                        series = betterSeries;
-                }
-
-            }
-            if (player.SpadesCards.Count >= 3 || player.JokerCards.Count > 0 && player.SpadesCards.Count >= 2)
-            {
-                if(series.Count < 3)
-                    series = CheckSeries(player.SpadesCards, player.JokerCards);
-                else
-                {
-                    List<Card> betterSeries = CheckSeries(player.SpadesCards, player.JokerCards);
-                    if (Card.CardSum(series) < Card.CardSum(betterSeries))
-                        series = betterSeries;
-                }
-            }*/
-
             // Checking if two cards or more have the same value 
             player.Cards.Sort();
             var sameCardValue = -1;
@@ -1034,49 +995,17 @@ namespace YanivUbuntu
                 CheckWhoIsTheWinner(player);
                 return;
             }
-
-            // If table card is a low value card or the player has another card in his cards with the same value
-            // He will take it for the next round
-            // If the card on the table isn't helpful, the player will take a deck card   
-            /*if(tableCards[0].CardShape == Shapes.JOKER)
-            {
-                if (player.PlayerNumber == 1) playersCardDrawings[1] = CardDrawing.LEFT;
-                else playersCardDrawings[2] = CardDrawing.LEFT;
-                cardToTake = new Card(tableCards[0]);
-            }
-            else if (tableCards[tableCards.Count - 1].CardShape == Shapes.JOKER)
-            {
-                if (player.PlayerNumber == 1) playersCardDrawings[1] = CardDrawing.RIGHT;
-                else playersCardDrawings[2] = CardDrawing.RIGHT;
-                cardToTake = new Card(tableCards[tableCards.Count - 1]);
-            }
-            else if (tableCards[0].CardValue < 3 ||
-                     player.Cards.Exists(card => card.CardValue == tableCards[0].CardValue))
-            {
-                if (player.PlayerNumber == 1) playersCardDrawings[1] = CardDrawing.LEFT;
-                else playersCardDrawings[2] = CardDrawing.LEFT;
-                cardToTake = new Card(tableCards[0]);
-            }
-            else if (tableCards[tableCards.Count - 1].CardValue < 3 ||
-                     player.Cards.Exists(card => card.CardValue == tableCards[tableCards.Count - 1].CardValue))
-            {
-                if (player.PlayerNumber == 1) playersCardDrawings[1] = CardDrawing.RIGHT;
-                else playersCardDrawings[2] = CardDrawing.RIGHT;
-                cardToTake = new Card(tableCards[tableCards.Count - 1]);
-            }
-            else
-            {
-                if (player.PlayerNumber == 1) playersCardDrawings[1] = CardDrawing.DECK;
-                else playersCardDrawings[2] = CardDrawing.DECK;
-                cardToTake = GenerateCard();
-                deckCard1 = true;
-            }*/
-
+            
             Card[] allowedToTake = {tableCards[0], tableCards[tableCards.Count - 1]};
             var seriesSum = 0;
             // Check if one of the table cards complete a series
             for (var i = 0; i < 2 && cardToTake == null; i++)
             {
+                if (allowedToTake[i].CardShape == Shapes.JOKER)
+                {
+                    cardToTake = new Card(allowedToTake[i]);
+                    break;
+                }
                 var shapeCards = allowedToTake[i].CardShape == Shapes.CLUBS ? new List<Card>(player.ClubsCards) :
                     allowedToTake[i].CardShape == Shapes.HEARTS ? new List<Card>(player.HeartsCards)  :
                     allowedToTake[i].CardShape == Shapes.SPADES ? new List<Card>(player.SpadesCards) :
@@ -1135,6 +1064,7 @@ namespace YanivUbuntu
                 p.ScorePlayer(p == player && assaf);
             }
         }
+
         private List<Card> CheckSeries(List<Card> cards)
         {
             var series = new List<Card>();
@@ -1147,19 +1077,19 @@ namespace YanivUbuntu
             for (var i = 0; i < pickedCardsWnj.Count - 1; i++)
             {
                 if ((lastSeriesValue != -1 && lastSeriesValue == pickedCardsWnj[i].CardValue) &&
-                    pickedCardsWnj[i].CardValue + 1 == pickedCardsWnj[i + 1].CardValue || 
+                    pickedCardsWnj[i].CardValue + 1 == pickedCardsWnj[i + 1].CardValue ||
                     (lastSeriesValue == -1 && pickedCardsWnj[i].CardValue + 1 == pickedCardsWnj[i + 1].CardValue))
                 {
-                    if(lastSeriesValue != pickedCardsWnj[i].CardValue)
+                    if (lastSeriesValue != pickedCardsWnj[i].CardValue)
                         series.Add(pickedCardsWnj[i]);
                     series.Add(pickedCardsWnj[i + 1]);
                     lastSeriesValue = pickedCardsWnj[i + 1].CardValue;
                 } else if ((lastSeriesValue != -1 && lastSeriesValue == pickedCardsWnj[i].CardValue &&
-                           pickedCardsWnj[i].CardValue + jokers.Count + 1 == pickedCardsWnj[i + 1].CardValue) ||
-                           (lastSeriesValue == -1  &&
-                           pickedCardsWnj[i].CardValue + jokers.Count + 1 == pickedCardsWnj[i + 1].CardValue))
+                            pickedCardsWnj[i].CardValue + jokers.Count + 1 == pickedCardsWnj[i + 1].CardValue) ||
+                           (lastSeriesValue == -1 &&
+                            pickedCardsWnj[i].CardValue + jokers.Count + 1 == pickedCardsWnj[i + 1].CardValue))
                 {
-                    if(lastSeriesValue != pickedCardsWnj[i].CardValue)
+                    if (lastSeriesValue != pickedCardsWnj[i].CardValue)
                         series.Add(pickedCardsWnj[i]);
                     for (var j = 0; j < pickedCardsWnj[i + 1].CardValue - pickedCardsWnj[i].CardValue - 1; j++)
                     {
@@ -1167,13 +1097,23 @@ namespace YanivUbuntu
                         joker.CardValue = pickedCardsWnj[i].CardValue + jokers.Count;
                         series.Add(joker);
                     }
+
                     series.Add(pickedCardsWnj[i + 1]);
                     lastSeriesValue = pickedCardsWnj[i + 1].CardValue;
                 }
             }
+
+            if (series.Count != 2) return series;
+
+            foreach (var joker in jokers.Where(joker => joker.CardValue - 1 == series[series.Count - 1].CardValue))
+            {
+                series.Add(joker);
+                break;
+            }
+
             return series;
         }
-        
+
         private void Deal(Player player)
         {
             var playersDeck = new List<Card>();
