@@ -106,75 +106,16 @@ namespace YanivUbuntu
 
         public List<Card> Play(Card newCard)
         {
-            /*/*PickedCards.Sort();
-            
-            for (var i = 0; i < pickedCardsWnj.Count - 1; i++)
-            {
-                if (pickedCardsWnj[i].CardValue + 1 == pickedCardsWnj[i + 1].CardValue ||
-                    pickedCardsWnj[i].CardValue + JokerCards.Count + 1 == pickedCardsWnj[i + 1].CardValue)
-                    series = true;
-                if (pickedCardsWnj[i].CardValue == pickedCardsWnj[i + 1].CardValue)
-                    equalValue = true;
-            }
-
-            Cards.Sort();
-            // If an illegal move is been picked, discard it and throw the largest card
-            if (series && equalValue || ((!series || PickedCards.Count < 3) && (!equalValue || PickedCards.Count < 2) &&
-                                         PickedCards.Count != 1))
-            {
-                foreach (var pCard in PickedCards)
-                {
-                    pCard.Picked = false;
-                    pCard.CardState = CardState.PUT_DOWN;
-                }
-                PickedCards.Clear();
-                if (Cards.Any(c => c.CardValue != newCard.CardValue))
-                    PickedCards.Add(Cards[Cards.Count - 1]);
-                
-
-            }#1#
-            List<Card> thrownCards;
-            if (PickedCardsRule == ThrowingRule.SERIES)
-            {
-                var pickedCardsWnj = new List<Card>(PickedCards);
-                pickedCardsWnj.RemoveAll(c => c.CardShape == Shapes.JOKER);
-                // Organize cards in a sorted matter, including finding the 
-                // right place for the joker, if it replaces a middle card in the series.
-                thrownCards = new List<Card>();
-                pickedCardsWnj.Sort();
-                for (int i = 0; i < pickedCardsWnj.Count - 1; i++)
-                {
-                    if (pickedCardsWnj[i].CardValue + 1 == pickedCardsWnj[i + 1].CardValue)
-                    {
-                        thrownCards.Add(pickedCardsWnj[i]);
-                        thrownCards.Add(pickedCardsWnj[i + 1]);
-                        i++;
-                    } else
-                    {
-                        thrownCards.Add(pickedCardsWnj[i]);
-                        for (var j = 0; j < pickedCardsWnj[i + 1].CardValue - pickedCardsWnj[i].CardValue - 1; j++)
-                        {
-                            var joker = JokerCards.Find(card => card.Picked);
-                            joker.Picked = false;
-                            thrownCards.Add(joker);
-                        }
-                        thrownCards.Add(pickedCardsWnj[i + 1]);
-                    }
-                }
-
-                // If joker replaces the smallest card or the largest card, 
-                // We need to add it.
-                if (JokerCards.Exists(card => card.Picked))
-                    thrownCards.AddRange(JokerCards.GetRange(JokerCards.FindIndex(card => card.Picked),
-                        JokerCards.FindLastIndex(card => card.Picked)));
-                
-            } else
-            {
-                thrownCards = new List<Card>(PickedCards);
-            }*/
-            
             var thrownCards = new List<Card>(PickedCards);
             thrownCards.Sort();
+            for (var index = 0; index < thrownCards.Count; index++)
+            {
+                if (thrownCards[index].Equals(thrownCards[index + 1]))
+                {
+                    
+                }
+            }
+
             foreach (var card in thrownCards.Where(card => card.CardShape == Shapes.JOKER))
                 card.CardValue = 0;
             
