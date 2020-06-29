@@ -1,0 +1,81 @@
+{
+  "format": 1,
+  "restore": {
+    "/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/YanivUbuntu.csproj": {}
+  },
+  "projects": {
+    "/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/YanivUbuntu.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/YanivUbuntu.csproj",
+        "projectName": "YanivUbuntu",
+        "projectPath": "/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/YanivUbuntu.csproj",
+        "packagesPath": "/home/sharon/.nuget/packages/",
+        "outputPath": "/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/obj/",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
+        "configFilePaths": [
+          "/home/sharon/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp2.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp2.0": {
+            "projectReferences": {
+              "/home2/Workplace/CSharp Projects/lidgren-network-gen3/Lidgren.Network/Lidgren.Network.csproj": {
+                "projectPath": "/home2/Workplace/CSharp Projects/lidgren-network-gen3/Lidgren.Network/Lidgren.Network.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp2.0": {
+          "dependencies": {
+            "Microsoft.NETCore.App": {
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[2.0.0, )",
+              "autoReferenced": true
+            },
+            "MonoGame.Content.Builder": {
+              "target": "Package",
+              "version": "[3.7.0.4, )"
+            },
+            "MonoGame.Framework.DesktopGL.Core": {
+              "target": "Package",
+              "version": "[3.7.0.7, )"
+            }
+          },
+          "imports": [
+            "net461"
+          ],
+          "assetTargetFallback": true,
+          "warn": true
+        }
+      }
+    },
+    "/home2/Workplace/CSharp Projects/lidgren-network-gen3/Lidgren.Network/Lidgren.Network.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home2/Workplace/CSharp Projects/lidgren-network-gen3/Lidgren.Network/Lidgren.Network.csproj",
+        "projectName": "Lidgren.Network",
+        "projectPath": "/home2/Workplace/CSharp Projects/lidgren-network-gen3/Lidgren.Network/Lidgren.Network.csproj"
+      },
+      "frameworks": {
+        "net46": {}
+      }
+    }
+  }
+}

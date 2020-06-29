@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SourceFile>/home/sharon/Workspace/C# Projects/YanivCardGame-master/Game2/Content/CardsShuffle.mp3</SourceFile>
+  <SourceTime>2020-02-23T15:12:08+02:00</SourceTime>
+  <DestFile>/home/sharon/Workspace/C# Projects/YanivCardGame-master/Game2/Content/bin/Windows/CardsShuffle.xnb</DestFile>
+  <DestTime>2020-04-16T15:17:46.2825693+03:00</DestTime>
+  <Importer>Mp3Importer</Importer>
+  <ImporterTime>2020-04-16T14:40:38.5168563+03:00</ImporterTime>
+  <Processor>SoundEffectProcessor</Processor>
+  <ProcessorTime>2020-04-16T14:40:38.5168563+03:00</ProcessorTime>
+  <Parameters>
+    <Key>Quality</Key>
+    <Value>Best</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

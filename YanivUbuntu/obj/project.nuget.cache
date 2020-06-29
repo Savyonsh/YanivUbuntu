@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "xBrSBCH7u1OcPCdB21CSPbrICfoQAqrZQmcHl7DZ9sYL4NBYT9EIeaLgFp2BqrrYndC+4OQBsOw589JQQaAhMQ==",
+  "success": true,
+  "projectFilePath": "/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/YanivUbuntu.csproj",
+  "expectedPackageFiles": [
+    "/home/sharon/.nuget/packages/microsoft.netcore.app/2.0.0/microsoft.netcore.app.2.0.0.nupkg.sha512",
+    "/home/sharon/.nuget/packages/microsoft.netcore.dotnetapphost/2.0.0/microsoft.netcore.dotnetapphost.2.0.0.nupkg.sha512",
+    "/home/sharon/.nuget/packages/microsoft.netcore.dotnethostpolicy/2.0.0/microsoft.netcore.dotnethostpolicy.2.0.0.nupkg.sha512",
+    "/home/sharon/.nuget/packages/microsoft.netcore.dotnethostresolver/2.0.0/microsoft.netcore.dotnethostresolver.2.0.0.nupkg.sha512",
+    "/usr/share/dotnet/sdk/NuGetFallbackFolder/microsoft.netcore.platforms/2.0.0/microsoft.netcore.platforms.2.0.0.nupkg.sha512",
+    "/home/sharon/.nuget/packages/monogame.content.builder/3.7.0.4/monogame.content.builder.3.7.0.4.nupkg.sha512",
+    "/home/sharon/.nuget/packages/monogame.framework.desktopgl.core/3.7.0.7/monogame.framework.desktopgl.core.3.7.0.7.nupkg.sha512",
+    "/home/sharon/.nuget/packages/netstandard.library/2.0.0/netstandard.library.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

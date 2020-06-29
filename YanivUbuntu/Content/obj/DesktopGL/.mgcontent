@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/again.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/assaf.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backgroundEmpty.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backgroundLight.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/callIt.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cantTakeCard.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/card.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardLeftPlayer.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardRightPlayer.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/chooseCircleLarge.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/chooseCircleSmall.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/deckRedBack.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/fddsf.psd</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1Turn.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1Won.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2Turn.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2Won.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/sort.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startupScreen.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/throwCard.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/tookCard.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/yaniv.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/youWon.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/amount.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/score.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoreTitle.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</File>
+  </SourceFiles>
+</SourceFileCollection>
