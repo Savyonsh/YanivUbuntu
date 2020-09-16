@@ -113,5 +113,11 @@ namespace YanivUbuntu
             cards = sortedCards;
             return throwingRule;
         }*/
+
+        public override string ToString()
+        {
+            return "    " +(CardValue + 1) + " " + CardShape;
+        }
     }
+    
 }

@@ -107,18 +107,10 @@ namespace YanivUbuntu
         public List<Card> Play(Card newCard)
         {
             var thrownCards = new List<Card>(PickedCards);
-            thrownCards.Sort();
-            for (var index = 0; index < thrownCards.Count; index++)
-            {
-                if (thrownCards[index].Equals(thrownCards[index + 1]))
-                {
-                    
-                }
-            }
 
             foreach (var card in thrownCards.Where(card => card.CardShape == Shapes.JOKER))
                 card.CardValue = 0;
-            
+            if (newCard.CardShape == Shapes.JOKER) newCard.CardValue = 0;
             foreach (var pCard in PickedCards)
             {
                 Cards.Remove(pCard);
