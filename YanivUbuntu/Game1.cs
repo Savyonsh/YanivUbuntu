@@ -268,36 +268,36 @@ namespace YanivUbuntu
                                     players[i].Cards[j].spriteRectangle, Color.White);
                             }
 
-                } else
-                                        {
-                                            foreach (var card in players[i].Cards)
-                                            {
-                                                switch (card.CardState)
-                                                {
-                                                    case CardState.LIFT:
-                                                        if (card.spriteVector.Y > 450)
-                                                            card.spriteVector.Y -= 10;
-                                                        break;
-                                                    case CardState.PUT_DOWN:
-                                                        if (card.spriteVector.Y < 500)
-                                                            card.spriteVector.Y += 10;
-                                                        else card.CardState = CardState.NONE;
-                                                        break;
-                                                    case CardState.HOVER_UP:
-                                                        if (card.spriteVector.Y > 490)
-                                                            card.spriteVector.Y -= 5;
-                                                        break;
-                                                    case CardState.HOVER_DOWN:
-                                                        if (card.spriteVector.Y < 500)
-                                                            card.spriteVector.Y += 5;
-                                                        else card.CardState = CardState.NONE;
-                                                        break;
-                                                }
+                        } else
+                        {
+                            foreach (var card in players[i].Cards)
+                            {
+                                switch (card.CardState)
+                                {
+                                    case CardState.LIFT:
+                                        if (card.spriteVector.Y > 450)
+                                            card.spriteVector.Y -= 10;
+                                        break;
+                                    case CardState.PUT_DOWN:
+                                        if (card.spriteVector.Y < 500)
+                                            card.spriteVector.Y += 10;
+                                        else card.CardState = CardState.NONE;
+                                        break;
+                                    case CardState.HOVER_UP:
+                                        if (card.spriteVector.Y > 490)
+                                            card.spriteVector.Y -= 5;
+                                        break;
+                                    case CardState.HOVER_DOWN:
+                                        if (card.spriteVector.Y < 500)
+                                            card.spriteVector.Y += 5;
+                                        else card.CardState = CardState.NONE;
+                                        break;
+                                }
 
-                                                spriteBatch.Draw(card.SpriteTexture, card.spriteVector,
-                                                    card.spriteRectangle, Color.White);
-                                            }
-                                        }
+                                spriteBatch.Draw(card.SpriteTexture, card.spriteVector,
+                                    card.spriteRectangle, Color.White);
+                            }
+                        }
                     } else
                     {
                         var rightSprite = i == 1 ? cardLeftPlayer : cardRightPlayer;
@@ -572,10 +572,10 @@ namespace YanivUbuntu
                     {
 
                         var index = tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
-                                    tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
-                            ? tableCards.Count - 1
-                            : 0;
-                        thrownCards = players[0].Play(new Card(tableCards[index]));
+                                    !tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
+                            ? 0
+                            : tableCards.Count - 1;
+                            thrownCards = players[0].Play(new Card(tableCards[index]));
                         tookCard.spriteRectangle = tableCards[index].spriteRectangle;
                         playersCardDrawings[0] = index == 0 ? CardDrawing.LEFT : CardDrawing.RIGHT;
                         cardBeingThrown.CreateInstance().Play();
@@ -722,6 +722,20 @@ namespace YanivUbuntu
 
             // Deal cards for players
             foreach (var player in players) Deal(player);
+            
+            /*// DEBUG
+            players[1].ResetPlayer();
+            players[1].SetCards(new List<Card>()
+            {
+                new Card(Shapes.CLUBS, 10, Content.Load<Texture2D>("card")), 
+                new Card(Shapes.CLUBS, 11, Content.Load<Texture2D>("card")), 
+                new Card(Shapes.CLUBS, 12, Content.Load<Texture2D>("card")) ,
+                new Card(Shapes.HEARTS, 12, Content.Load<Texture2D>("card")) 
+            });
+            players[0].Cards[0].CardShape = Shapes.CLUBS;
+            players[0].Cards[0].CardValue = 9;*/
+            
+            
             // Organize cards for main player
             PlaceCardsOnMat();
         }
@@ -766,18 +780,16 @@ namespace YanivUbuntu
             tableCards.AddRange(arrayTableCards);
         }
 
-        private void ComputerStrategy(Player player, Card cardToTake, bool chosenFromDeck)
+        private List<Card> GetBestSeries(Player player)
         {
             var series = new List<Card>();
-            var sameValueCards = new List<Card>();
-           
-            // Checking if a series exists
-            List<Card>[] shapes = {player.ClubsCards, player.DiamondCards, player.HeartsCards, player.SpadesCards}; 
-            foreach (var t in shapes)
+            // Checking if a series exists, excluding the series planned to be thrown the next round, if existed
+            var shapes = new List<List<Card>>() {player.ClubsCards,  player.HeartsCards, player.SpadesCards, player.DiamondCards};
+
+            foreach (var demoCards in shapes.Select(t => new List<Card>(t)))
             {
-                var demoCards = new List<Card>(t);
                 demoCards.AddRange(player.JokerCards);
-                if (demoCards.Count < 3) continue;
+                if (demoCards.Count < 3 || demoCards.Exists(card => card.Picked)) continue;
                 if(series.Count < 3)
                     series = CheckSeries(demoCards);
                 else
@@ -787,6 +799,16 @@ namespace YanivUbuntu
                         series = betterSeries;
                 }
             }
+
+            return series;
+        }
+        private void ComputerStrategy(Player player, Card cardToTake, bool chosenFromDeck)
+        {
+            if(chosenFromDeck) player.UnpickPickedCards();
+            
+            var series = GetBestSeries(player);
+            var sameValueCards = new List<Card>();
+            
             // Checking if two cards or more have the same value 
             player.Cards.Sort();
             var sameCardValue = -1;
@@ -794,7 +816,7 @@ namespace YanivUbuntu
             
             for (var i =  player.Cards.Count - 1; i > 0; i--)
             {
-                if (!chosenFromDeck)
+                /*if (!chosenFromDeck)
                 {
                     if (largestCardThatNotThrown == null && player.Cards[i].CardValue != cardToTake.CardValue)
                         largestCardThatNotThrown = player.Cards[i];
@@ -802,12 +824,13 @@ namespace YanivUbuntu
                 {
                     if (largestCardThatNotThrown == null && player.Cards[i].CardShape != Shapes.JOKER)
                         largestCardThatNotThrown = player.Cards[i];
-                }
+                }*/
+                if(largestCardThatNotThrown == null && !player.Cards[i].Picked) largestCardThatNotThrown = player.Cards[i];
                 
                 // If there is two or more cards with the same value
                 if (player.Cards[i].CardValue != player.Cards[i - 1].CardValue ||
-                    player.Cards[i].CardShape == Shapes.JOKER || (!chosenFromDeck &&
-                    player.Cards[i].CardValue == cardToTake.CardValue)) continue;
+                    player.Cards[i].CardShape == Shapes.JOKER || player.Cards[i].Picked 
+                    || player.Cards[i - 1].Picked) continue;
                 if (sameValueCards.Count == 0)
                 {
                     if(!sameValueCards.Contains(player.Cards[i])) sameValueCards.Add(player.Cards[i]);
@@ -826,6 +849,7 @@ namespace YanivUbuntu
                 // If player chose a deck card he would throw it anyway. 
             }
 
+            player.UnpickPickedCards();
             // Check value of largest card as opposed to the findings above
             var seriesValue = series.Count >= 3 ? Card.CardSum(series) : 0;
             var sameValueCardsValue = sameCardValue * sameValueCards.Count;
@@ -880,31 +904,44 @@ namespace YanivUbuntu
                 shapeCards.Add(allowedToTake[i]);
                 List<Card> series;
                 if ((series = CheckSeries(shapeCards)).Count < 3) continue;
+                
+                // Check if there is a series without the table cards
+                var betterSeries = GetBestSeries(player);
+                if (Card.CardSum(series) > Card.CardSum(betterSeries))
+                    cardToTake = new Card(allowedToTake[i]);
+                else
+                    series = betterSeries;
+                player.PickCards(series);
                 seriesSum = Card.CardSum(series);
-                cardToTake = new Card(allowedToTake[i]);
             }
+            
 
             // Check if one of the table cards exists in players cards
             // Compare its sum to the potential series, if found earlier.
-            var saveValueSum = 0;
+            var saveValueSum = int.MinValue;
             for (var i = 0; i < 2; i++)
             {
-                if (!player.Cards.Exists(card => card.CardValue == allowedToTake[i].CardValue) ||
+                /*if (!player.Cards.Exists(card => card.CardValue == allowedToTake[i].CardValue) ||
                     allowedToTake[i].CardValue * 2 <= seriesSum || allowedToTake[i].CardValue * 2 <= saveValueSum) continue;
+                
                 cardToTake = new Card(allowedToTake[i]);
-                saveValueSum = allowedToTake[i].CardValue * 2;
+                saveValueSum = allowedToTake[i].CardValue * 2;*/
+
+                foreach (var card in player.Cards.Where(card => card.CardValue == allowedToTake[i].CardValue && 
+                                                                card.CardValue > saveValueSum && card.CardValue * 2 > seriesSum))
+                {
+                    player.UnpickPickedCards();
+                    player.PickCards(new List<Card>(){card});
+                    saveValueSum = card.CardValue;
+                    cardToTake = new Card(tableCards[i]);
+                }
             }
 
             // If the cards on the table don't fit a double throw or a series
-            // if one of the table cards has a small value
-            for (var i = 0; i < 2 && cardToTake == null; i++) {
-                if (allowedToTake[i].CardValue < 3)
-                    cardToTake = new Card(allowedToTake[i]);
-            }
-
+            // check if one of the table cards has a small value
             if (cardToTake == null)
             {
-                Card min = allowedToTake[0].CardValue < allowedToTake[1].CardValue ? allowedToTake[0] : allowedToTake[1];
+                var min = allowedToTake[0].CardValue < allowedToTake[1].CardValue ? allowedToTake[0] : allowedToTake[1];
                 if (min.CardValue <= 2)
                 {
                     cardToTake = min;

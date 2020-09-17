@@ -140,6 +140,21 @@ namespace YanivUbuntu
             if (Score == 50) Score = 0; 
             else if (Score % 50 == 0) Score /= 2;
         }
+
+        public void PickCards(List<Card> cards)
+        {
+            PickedCards = cards;
+            foreach (var card in cards)
+                card.Picked = true;
+        }
+
+        public void UnpickPickedCards()
+        {
+            foreach (var card in PickedCards)
+                card.Picked = false;
+            
+            PickedCards.Clear();
+        }
     }
     
     
