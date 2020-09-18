@@ -77,9 +77,11 @@ namespace YanivUbuntu
             {
                 card.Picked = true;
                 PickedCards.Sort();
-                if (card.CardShape == Shapes.JOKER) {
+                if (card.CardShape == Shapes.JOKER)
+                {
                     if (PickedCards.Count > 0)
                         card.CardValue = PickedCards[PickedCards.Count - 1].CardValue + 1;
+                    else card.CardValue = 0;
                 }
                 PickedCards.Add(card);
                 card.CardState = CardState.LIFT;

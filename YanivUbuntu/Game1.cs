@@ -450,16 +450,17 @@ namespace YanivUbuntu
 
                     if (currentTime > 5f)
                     {
-                        spriteBatch.End();
-                        base.Draw(gameTime);
                         roundNumber--;
                         if (roundNumber <= 0)
                         {
                             startGame = false;
+                            spriteBatch.End();
+                            base.Draw(gameTime);
                             return;
                         }
-
                         StartGameSetting();
+                        spriteBatch.End();
+                        base.Draw(gameTime);
                         return;
                     }
 
@@ -674,24 +675,21 @@ namespace YanivUbuntu
 
         private void StartGameSetting()
         {
-            randomIndex = 53; 
+            randomIndex = 53;
             // Creating the deck
             for (byte i = 0; i < 54; i++) deck[i] = i;
             tableCards.Clear();
             thrownCards.Clear();
             PlaceTableCard();
-            // Setting who starts according to last game result
-            if (winner != 4 && startGame)
-                turnCounter = winner;
-            else turnCounter = 0;
+            turnCounter = 0;
             winner = 4;
             assaf = false;
             currentTime = 0f;
             i1 = 0;
-            if(numOfPlayers == 0) numOfPlayers = 3;
+            if (numOfPlayers == 0) numOfPlayers = 3;
             openingCardShufflePlayed = false;
             // Creating the players according to choices
-            if (players == null)
+            if (players == null || !startGame)
             {
                 players = new List<Player>();
                 playersCardDrawings = new List<CardDrawing>();
@@ -712,17 +710,31 @@ namespace YanivUbuntu
                 }
 
                 tookCard.spriteVector.Y = playersCardsVectors[0][0].Y + 50;
-            } else
+            } /*else if (numOfPlayers < players.Count)
             {
-                foreach (var player in players)
+                players.RemoveAt(players.Count - 1);
+                playersCardDrawings.RemoveAt(playersCardDrawings.Count - 1);
+                playersCardsVectors.RemoveAt(playersCardsVectors.Count - 1);
+            } else if (numOfPlayers > players.Count)
+            {
+                players.Add(new Player(2, ""));
+                playersCardDrawings.Add(CardDrawing.NONE);
+                playersCardsVectors.Add(new Vector2[7]);
+                for (i1 = 0; i1 < 7; i1++)
                 {
-                    player.ResetPlayer();
+                    playersCardsVectors[1][i1] = new Vector2(560, 165 + 25 * i1);
                 }
+            }*/
+
+            foreach (var player in players)
+            {
+                player.ResetPlayer();
             }
+
 
             // Deal cards for players
             foreach (var player in players) Deal(player);
-            
+
             /*// DEBUG
             players[1].ResetPlayer();
             players[1].SetCards(new List<Card>()
@@ -734,12 +746,13 @@ namespace YanivUbuntu
             });
             players[0].Cards[0].CardShape = Shapes.CLUBS;
             players[0].Cards[0].CardValue = 9;*/
-            
-            
+
+
             // Organize cards for main player
             PlaceCardsOnMat();
         }
 
+        
         private bool CheckIfLegal(Player player)
         {
             if (player.PickedCards.Count == 0) return false;
@@ -829,7 +842,9 @@ namespace YanivUbuntu
                 
                 // If there is two or more cards with the same value
                 if (player.Cards[i].CardValue != player.Cards[i - 1].CardValue ||
-                    player.Cards[i].CardShape == Shapes.JOKER || player.Cards[i].Picked 
+                    player.Cards[i].CardShape == Shapes.JOKER || 
+                    player.Cards[i - 1].CardShape == Shapes.JOKER || 
+                    player.Cards[i].Picked 
                     || player.Cards[i - 1].Picked) continue;
                 if (sameValueCards.Count == 0)
                 {
