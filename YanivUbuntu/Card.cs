@@ -44,14 +44,13 @@ namespace YanivUbuntu
             return CardValue - other.CardValue;
         }
 
-        public static int CardSum(List<Card> listOfCards)
-        {
+        public static int CardSum(List<Card> listOfCards) {
             var sum = 0;
-            foreach (var card in listOfCards.Where(card => card.CardShape != Shapes.JOKER))
-            {
+            foreach (var card in listOfCards.Where(card => card.CardShape != Shapes.JOKER)) {
                 if (card.CardValue % 13 < 11) sum += (card.CardValue % 13 + 1);
                 else sum += 10;
             }
+
             return sum;
         }
 
