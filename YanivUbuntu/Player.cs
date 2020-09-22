@@ -18,8 +18,9 @@ namespace YanivUbuntu
         public List<Card> HeartsCards { get; }
         public List<Card> SpadesCards { get; }
         public List<Card> JokerCards { get;}
-        public List<Card> PickedCards { get; set; }
-        
+        public List<Card> PickedCards { get; private set; }
+        public List<List<Card>> OrganizedCards { get; }
+
         public Player(int number, string name)
         { 
             PlayerNumber = number;
@@ -32,6 +33,9 @@ namespace YanivUbuntu
             SpadesCards = new List<Card>();
             PickedCards = new List<Card>();
             JokerCards = new List<Card>();
+            OrganizedCards = new List<List<Card>>() {
+                ClubsCards, HeartsCards, SpadesCards, DiamondCards
+            };
         }
         public void SetCards(List<Card> cards)
         {
@@ -59,6 +63,8 @@ namespace YanivUbuntu
                 }
             }
         }
+        
+        
 
         public int CardSum()
         {
@@ -88,13 +94,6 @@ namespace YanivUbuntu
             }
         }
 
-        public void PickCards()
-        {
-            foreach (Card card in PickedCards)
-            {
-                card.Picked = true;
-            }
-        }
         public void ResetPlayer()
         {
             Cards.Clear();
@@ -109,10 +108,8 @@ namespace YanivUbuntu
         public List<Card> Play(Card newCard)
         {
             var thrownCards = new List<Card>(PickedCards);
-
-            foreach (var card in thrownCards.Where(card => card.CardShape == Shapes.JOKER))
-                card.CardValue = 0;
-            if (newCard.CardShape == Shapes.JOKER) newCard.CardValue = 0;
+        //   thrownCards.Sort();
+            
             foreach (var pCard in PickedCards)
             {
                 Cards.Remove(pCard);
@@ -122,19 +119,13 @@ namespace YanivUbuntu
                 DiamondCards.Remove(pCard);
                 JokerCards.Remove(pCard);
                 pCard.Picked = false;
-                
+
             }
             PickedCards.Clear();
             SetCards(new List<Card>{newCard});
             return thrownCards;
         }
 
-        public void FixList(Card[] cards)
-        {
-            this.Cards.Clear();
-            this.Cards.AddRange(cards);
-        }
-        
         public void ScorePlayer(bool penalty)
         {
             Score += CardSum();

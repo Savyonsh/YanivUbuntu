@@ -717,18 +717,17 @@ namespace YanivUbuntu
             // Deal cards for players
             foreach (var player in players) Deal(player);
 
-            // DEBUG
-            /*players[0].ResetPlayer();
-            players[0].SetCards(new List<Card>() {
-                new Card(Shapes.CLUBS, 10, Content.Load<Texture2D>("card")),
-                new Card(Shapes.CLUBS, 9, Content.Load<Texture2D>("card")),
-                new Card(Shapes.CLUBS, 12, Content.Load<Texture2D>("card")),
-                new Card(Shapes.JOKER, 1, Content.Load<Texture2D>("card")),
-                new Card(Shapes.DIAMONDS, 10, Content.Load<Texture2D>("card"))
-            });*/
+            /*// DEBUG
+            players[1].ResetPlayer();
+            players[1].SetCards(new List<Card>() {
+                new Card(Shapes.CLUBS, 3, Content.Load<Texture2D>("card")),
+                new Card(Shapes.CLUBS, 5, Content.Load<Texture2D>("card")),
+                new Card(Shapes.DIAMONDS, 5, Content.Load<Texture2D>("card"))
+            });
 
-            /*players[0].Cards[0].CardValue = 11;
+            players[0].Cards[0].CardValue = 4;
             players[0].Cards[0].CardShape = Shapes.CLUBS;*/
+            
             // Organize cards for main player
             PlaceCardsOnMat();
         }
@@ -762,10 +761,13 @@ namespace YanivUbuntu
 
         private void ReplaceTableCards(List<Card> cards)
         {
-            // Fix joker value, if exists
-            foreach (var card in cards.Where(card => card.CardShape == Shapes.JOKER))
-                card.CardValue = 0;
-            
+            if(cards.Count == 0) return;
+            cards.Sort();
+
+            var jokers = cards.FindAll(card => card.CardShape == Shapes.JOKER);
+            foreach (var joker in jokers) 
+                joker.CardValue = joker.spriteRectangle.X / 79;
+
             var middle = cards.Count % 2 == 0 ? cards.Count / 2 : (cards.Count - 1) / 2;
             cards[middle].spriteVector.X = 310;
             cards[middle].spriteVector.Y = 220;
@@ -802,87 +804,73 @@ namespace YanivUbuntu
 
             return series;
         }
-
-        private void ComputerStrategy(Player player, Card cardToTake, bool chosenFromDeck) {
-            if (chosenFromDeck) player.UnpickPickedCards();
-            
-            var series = GetBestSeries(player);
-            var sameValueCards = new List<Card>();
-
-            // Checking if two cards or more have the same value 
-            player.Cards.Sort();
-            var sameCardValue = -1;
-            Card largestCardThatNotThrown = null;
-
-            for (var i = player.Cards.Count - 1; i > 0; i--) {
-                /*if (!chosenFromDeck)
-                {
-                    if (largestCardThatNotThrown == null && player.Cards[i].CardValue != cardToTake.CardValue)
-                        largestCardThatNotThrown = player.Cards[i];
-                } else
-                {
-                    if (largestCardThatNotThrown == null && player.Cards[i].CardShape != Shapes.JOKER)
-                        largestCardThatNotThrown = player.Cards[i];
-                }*/
-                if (largestCardThatNotThrown == null && !player.Cards[i].Picked)
-                    largestCardThatNotThrown = player.Cards[i];
-
-                // If there is two or more cards with the same value
-                if (player.Cards[i].CardValue != player.Cards[i - 1].CardValue ||
-                    player.Cards[i].CardShape == Shapes.JOKER ||
-                    player.Cards[i - 1].CardShape == Shapes.JOKER ||
-                    player.Cards[i].Picked
-                    || player.Cards[i - 1].Picked) continue;
-                if (sameValueCards.Count == 0) {
-                    if (!sameValueCards.Contains(player.Cards[i])) sameValueCards.Add(player.Cards[i]);
-                    sameValueCards.Add(player.Cards[i - 1]);
-                    sameCardValue = player.Cards[i].CardValue;
-                }
-                // To avoid two cases of equality. 
-                else if (player.Cards[i].CardValue == sameCardValue) {
-                    if (!sameValueCards.Contains(player.Cards[i])) sameValueCards.Add(player.Cards[i]);
-                    sameValueCards.Add(player.Cards[i - 1]);
-                }
-
-                // If player chose a table card he wouldn't throw cards with
-                // it's value so he would throw them on the next round.
-                // If player chose a deck card he would throw it anyway. 
-            }
-
-            player.UnpickPickedCards();
-            // Check value of largest card as opposed to the findings above
-            var seriesValue = series.Count >= 3 ? Card.CardSum(series) : 0;
-            var sameValueCardsValue = sameCardValue * sameValueCards.Count;
-            largestCardThatNotThrown ??= player.Cards[player.Cards.Count - 1];
-
-            if (seriesValue > player.Cards[player.Cards.Count - 1].CardValue &&
-                seriesValue > sameValueCardsValue)
-                player.PickedCards = series;
-            else if (sameValueCardsValue >= largestCardThatNotThrown.CardValue &&
-                     sameValueCardsValue > seriesValue)
-                player.PickedCards = sameValueCards;
-            else {
-                player.PickedCards = new List<Card> {largestCardThatNotThrown};
-            }
-
-            player.PickCards();
-            
-        }
-
+        
         private void ComputerStrategy(Player player) {
-            Card cardToTake = null;
-            var seriesSum = 0;
-
+            
             if (player.CardSum() <= 7) {
                 CheckWhoIsTheWinner(player);
                 return;
             }
+            
+            Card cardToTake = null;
+            var seriesWithoutTableCardSum = 0;
+            var seriesWithTableCardSum = 0;
 
+            var doNotThrow = new List<Card>();
+            var doThrow = new List<Card>();
+            var optionalThrow = new List<Card>();
+
+            player.Cards.Sort();
+            player.Cards.Reverse();
+            
+            //    Throwing cards without relation to the table cards
+            //---------------------------------------------------------
+            
+            // Check if we can throw a series
+            foreach (var shapeCards in 
+                player.OrganizedCards.Where(shapeCard => shapeCard.Count > 1)) {
+                var series = new List<Card>(shapeCards);
+                series.AddRange(player.JokerCards);
+                series = CheckSeries(series);
+                var currentSum = Card.CardSum(series);
+                if (currentSum > seriesWithoutTableCardSum) seriesWithoutTableCardSum = currentSum;
+                else continue;
+                /*doThrow.Clear();
+                doThrow.AddRange(series);*/
+                doThrow = series;
+            }
+            
+            // Check double cards to throw
+            var sameCardValue = -1;
+            var sameCardSum = -1;
+            for (var i = 0; i < player.Cards.Count - 1; i++) {
+                if (player.Cards[i].CompareTo(player.Cards[i + 1]) != 0 ||
+                    player.Cards[i].CardShape == Shapes.JOKER ||
+                    player.Cards[i + 1].CardShape == Shapes.JOKER) continue;
+
+                if (sameCardValue != -1 && sameCardValue != player.Cards[i].CardValue) break;
+
+                if (sameCardValue == -1)
+                    sameCardSum = sameCardValue = player.Cards[i].CardValue;
+                
+                
+                // If the player can throw a series too, check with cards 
+                // he should throw based on the value. 
+                sameCardSum += player.Cards[i].CardValue;
+
+                if (seriesWithoutTableCardSum >= sameCardSum)
+                    continue;
+                
+                if (!optionalThrow.Contains(player.Cards[i]))
+                    optionalThrow.Add(player.Cards[i]);
+                optionalThrow.Add(player.Cards[i + 1]);
+            }
+            
+            //    Check if there is a throw on the next round based on the table cards
+            //--------------------------------------------------------------------------
             var allowedToTake = new List<Card>() {tableCards[0]};
             if (tableCards.Count > 1)
                 allowedToTake.Add(tableCards[tableCards.Count - 1]);
-            var doNotThrow = new List<Card>();
-            var doThrow = new List<Card>();
 
             // Check if one of the table cards complete a series
             foreach (var card in allowedToTake) {
@@ -891,7 +879,7 @@ namespace YanivUbuntu
                     cardToTake = card;
                     break;
                 }
-
+                
                 var shapeCards = card.CardShape switch {
                     Shapes.CLUBS => new List<Card>(player.ClubsCards),
                     Shapes.HEARTS => new List<Card>(player.HeartsCards),
@@ -901,61 +889,57 @@ namespace YanivUbuntu
 
                 shapeCards.AddRange(player.JokerCards);
                 shapeCards.Add(card);
-                if ((shapeCards = CheckSeries(shapeCards)).Count == 0) continue;
+                shapeCards = CheckSeries(shapeCards);
+                seriesWithTableCardSum = Card.CardSum(shapeCards);
+                if (!shapeCards.Contains(card) || seriesWithTableCardSum <= seriesWithoutTableCardSum) continue;
                 // Throwing series next turn with the new card
+                /*doNotThrow.Clear();
+                doNotThrow.AddRange(shapeCards);*/
                 cardToTake = card;
-                doNotThrow.AddRange(shapeCards);
-                break;
+                doNotThrow = shapeCards;
+                /*// Check if there is a series after removing cards that
+                // are going to be thrown at the next round
+                doThrow.RemoveAll(tCard => shapeCards.Contains(tCard));
+                doThrow = CheckSeries(doThrow);
+                // Check if there are cards in the optional throwing
+                optionalThrow.RemoveAll(tCard => shapeCards.Contains(tCard));*/
             }
             
-            // Check if we can throw a series
-            var series = CheckSeries(player.Cards);
-            if (!series.Exists(card => doNotThrow.Contains(card)) && 
-                (series.Count > 0 || Card.CardSum(series) > seriesSum)) {
-                doThrow.Clear();
-                doThrow.AddRange(series);
-                seriesSum = Card.CardSum(series);
-            } 
-
             // Check if one of the table cards exists in players cards.
-            player.Cards.Sort();
-            player.Cards.Reverse();
-            foreach (var tableCard in allowedToTake) {
-                foreach (var card in player.Cards.Where(card => card.CompareTo(tableCard) == 0 && !doThrow.Contains(card))) {
-                    cardToTake = tableCard;
-                    doNotThrow.Add(card);
+            //if (cardToTake == null) {
+                foreach (var tableCard in allowedToTake) {
+                    var allAppearances = player.Cards.FindAll(card => card.CompareTo(tableCard) == 0);
+                    /*if (allAppearances.Count * tableCard.CardValue > seriesWithoutTableCardSum) {
+                        // Check if there is a series after removing cards that
+                        // are going to be thrown at the next round
+                        doThrow.RemoveAll(card => allAppearances.Contains(card));
+                        doThrow = CheckSeries(doThrow);
+                        // Remove the optionalThrow if it contains the cards that 
+                        // are going to be thrown at the next round
+                        cardToTake = tableCard;
+                    } 
+                    // Check if the player should keep the card for series or the same-value cards
+                    if (optionalThrow.Exists(card => card.CompareTo(tableCard) == 0) &&
+                        allAppearances.Count * tableCard.CardValue > seriesWithTableCardSum) {
+                        doNotThrow.Clear();
+                        doNotThrow.AddRange(allAppearances);
+                        optionalThrow.Clear();
+                        cardToTake = tableCard;
+                    }*/
+                    if (allAppearances.Count * tableCard.CardValue > seriesWithoutTableCardSum ||
+                        (optionalThrow.Exists(card => card.CompareTo(tableCard) == 0) &&
+                         allAppearances.Count * tableCard.CardValue > seriesWithTableCardSum)) {
+                        doNotThrow = allAppearances;
+                        cardToTake = tableCard;
+                    }
                 }
-            }
+           // }
             
-            // Check double cards to throw
-            var sameCardValue = -1;
-            for (var i = 0; i < player.Cards.Count - 1; i++) {
-                if (player.Cards[i].CompareTo(player.Cards[i + 1]) != 0
-                    || doNotThrow.Contains(player.Cards[i]) ||
-                    doNotThrow.Contains(player.Cards[i + 1])) continue;
-                
-                if(sameCardValue != -1 && sameCardValue != 
-                        player.Cards[i].CardValue) break;
-
-                // If the player can throw a series too, check with cards 
-                // he should throw based on the value. 
-                if (sameCardValue == -1) {
-                    if (seriesSum < player.Cards[i].CardValue * 2) {
-                        if (doThrow.Count > 0 && seriesSum > 0)
-                            doThrow.Clear();
-                    } else break;
-                    sameCardValue = player.Cards[i].CardValue * 2;
-                } else sameCardValue += player.Cards[i].CardValue;
-                
-                if (!doThrow.Contains(player.Cards[i]))
-                    doThrow.Add(player.Cards[i]);
-                doThrow.Add(player.Cards[i + 1]);
-            }
-
             // If the cards on the table don't fit a double throw or a series completion
             // check if one of the table cards has a small value
             if (cardToTake == null) 
-                foreach (var tableCard in allowedToTake.Where(tableCard => tableCard.CardValue <= 2).Where(tableCard => cardToTake == null || cardToTake.CardValue > tableCard.CardValue)) 
+                foreach (var tableCard in allowedToTake.Where(tableCard => tableCard.CardValue <= 2).Where(tableCard =>
+                    cardToTake == null || cardToTake.CardValue > tableCard.CardValue)) 
                     cardToTake = tableCard;
 
             // Take from deck
@@ -964,14 +948,24 @@ namespace YanivUbuntu
                 cardToTake = GenerateCard();
             }
 
-            // If no cards got picked, pick the biggest card
-            var toThrow = player.Cards.Find(card => !tableCards.Exists(c => c.CompareTo(card) == 0) &&
-                                                    !doNotThrow.Contains(card));
-            // toThrow ??= player.Cards[0];
-            if (doThrow.Count == 0 || Card.CardSum(doThrow) < toThrow.CardValue) {
-                doThrow.Clear();
-                doThrow.Add(toThrow);
+            // Fix options after all the changes.
+            foreach (var card in doNotThrow) {
+                doThrow.Remove(card);
+                optionalThrow.Remove(card);
             }
+            doThrow = CheckSeries(doThrow);
+
+            
+            // If no cards got picked, pick the biggest card
+            var theEmptyOption = doThrow.Count == 0 ? ref doThrow : ref optionalThrow;
+            if(theEmptyOption.Count == 0)
+                theEmptyOption.Add(player.Cards.Find(card => 
+                    !tableCards.Exists(c => c.CompareTo(card) == 0) &&
+                                                             !doNotThrow.Contains(card)));
+            
+            // if there are two options, Choose the better one, or if the plans changed.
+            if (Card.CardSum(doThrow) < Card.CardSum(optionalThrow))
+                doThrow = optionalThrow;
             
             player.PickCards(doThrow);
             if(playersCardDrawings[player.PlayerNumber] != CardDrawing.DECK) 
@@ -999,54 +993,49 @@ namespace YanivUbuntu
             }
         }
 
-        private List<Card> CheckSeries(List<Card> cards)
-        {
+        private List<Card> CheckSeries(List<Card> cards) {
+            if (cards.Count == 0) return new List<Card>();
             var series = new List<Card>();
             var jokers = new List<Card>(cards);
             jokers.RemoveAll(c => c.CardShape != Shapes.JOKER);
             var pickedCardsWnj = new List<Card>(cards);
             pickedCardsWnj.RemoveAll(c => c.CardShape == Shapes.JOKER);
             
+            pickedCardsWnj.Sort();
+            pickedCardsWnj.Reverse();
+            
             // Check if all of the card has the same shape
             if (pickedCardsWnj.Count > 0 &&
                 !pickedCardsWnj.TrueForAll(card => card.CardShape == pickedCardsWnj[0].CardShape)) return series;
             
-                var lastSeriesValue = -1;
-            pickedCardsWnj.Sort();
-            for (var i = pickedCardsWnj.Count - 1; i > 0; i--)
-            {
-                if (((lastSeriesValue != -1 && lastSeriesValue == pickedCardsWnj[i].CardValue &&
-                    pickedCardsWnj[i].CardValue - 1 == pickedCardsWnj[i - 1].CardValue) ||
-                    (lastSeriesValue == -1 && pickedCardsWnj[i].CardValue - 1 == pickedCardsWnj[i - 1].CardValue)))
-                {
+            var lastSeriesValue = -1;
+            for (var i = 0; i < pickedCardsWnj.Count - 1; i++) {
+                if (pickedCardsWnj[i].CardValue - 1 == pickedCardsWnj[i + 1].CardValue && 
+                    (lastSeriesValue == -1 || lastSeriesValue == pickedCardsWnj[i].CardValue)) {
                     if (lastSeriesValue != pickedCardsWnj[i].CardValue)
                         series.Add(pickedCardsWnj[i]);
-                    series.Add(pickedCardsWnj[i - 1]);
-                    lastSeriesValue = pickedCardsWnj[i - 1].CardValue;
-                } else if (((lastSeriesValue != -1 && lastSeriesValue == pickedCardsWnj[i].CardValue &&
-                            pickedCardsWnj[i].CardValue - jokers.Count - 1 == pickedCardsWnj[i - 1].CardValue) ||
-                           (lastSeriesValue == -1 &&
-                            pickedCardsWnj[i].CardValue - jokers.Count - 1 == pickedCardsWnj[i - 1].CardValue)))
-                {
+                    series.Add(pickedCardsWnj[i + 1]);
+                    lastSeriesValue = pickedCardsWnj[i + 1].CardValue;
+                } else if (pickedCardsWnj[i].CardValue - jokers.Count - 1 == pickedCardsWnj[i + 1].CardValue 
+                           && (lastSeriesValue == -1 || lastSeriesValue == pickedCardsWnj[i].CardValue)) {
                     if (lastSeriesValue != pickedCardsWnj[i].CardValue)
                         series.Add(pickedCardsWnj[i]);
-                    for (var j = 0; j < pickedCardsWnj[i].CardValue - pickedCardsWnj[i - 1].CardValue && jokers.Count > 0; j++)
-                    {
-                        var joker = jokers[jokers.Count - 1 - j];
-                        joker.CardValue = pickedCardsWnj[i].CardValue - jokers.Count;
+                    lastSeriesValue = pickedCardsWnj[i].CardValue;
+                    for (var j = 0;
+                        j < pickedCardsWnj[i].CardValue - pickedCardsWnj[i + 1].CardValue && jokers.Count > 0;
+                        j++) {
+                        var joker = jokers[0];
+                        joker.CardValue = --lastSeriesValue;
                         series.Add(joker);
                         jokers.RemoveAt(0);
                     }
-
-                    series.Add(pickedCardsWnj[i - 1]);
-                    lastSeriesValue = pickedCardsWnj[i - 1].CardValue;
+                    series.Add(pickedCardsWnj[i + 1]);
                 }
             }
 
             if (series.Count == 2 && jokers.Count > 0) {
-                series.Sort();
-                var joker = jokers[jokers.Count - 1];
-                joker.CardValue = series[1].CardValue + 1 < 13 ? series[1].CardValue + 1 : series[0].CardValue - 1; 
+                var joker = jokers[0];
+                joker.CardValue = series[1].CardValue + 1 < 13 ? series[0].CardValue + 1 : series[1].CardValue - 1; 
                     series.Add(joker);
                 jokers.RemoveAt(0);
             }
@@ -1064,49 +1053,47 @@ namespace YanivUbuntu
             player.Cards.Sort();
         }
 
-        private void PlaceCardsOnMat()
-        {
-            Card[] cards = players[0].Cards.ToArray();
+        private void PlaceCardsOnMat() {
+
+            var cards = players[0].Cards;
+            
+            // Fix jokers value
+            var jokers = cards.FindAll(card => card.CardShape == Shapes.JOKER);
+            foreach (var joker in jokers)
+                joker.CardValue = joker.spriteRectangle.X / 79;
+
             int middle, addition = 0;
-            if (sort)
-            {
-                Array.Sort(cards);
-            }
-            if (cards.Length % 2 == 1)
-                middle = (cards.Length - 1) / 2;
-            else
-            {
-                middle = cards.Length / 2;
+            
+            if (sort) 
+                cards.Sort();
+            
+            if (cards.Count % 2 == 1)
+                middle = (cards.Count - 1) / 2;
+            else {
+                middle = cards.Count / 2;
                 addition = 40;
             }
 
             cards[middle].spriteVector.X = 320 + addition;
             cards[middle].spriteVector.Y = 500;
-            
+
             tookCard.spriteVector.X = cards[middle].spriteVector.X;
 
-            for (int i = 1; i <= middle; i++)
-            {
+            for (var i = 1; i <= middle; i++) {
                 cards[middle - i].spriteVector.X = 320 - (85 * i) + addition;
                 cards[middle - i].spriteVector.Y = 500;
-                if (middle + i < cards.Length)
-                {
+                if (middle + i < cards.Count) {
                     cards[middle + i].spriteVector.X = 320 + (85 * i) + addition;
                     cards[middle + i].spriteVector.Y = 500;
                 }
             }
-            if (!sort)
-            {
-                var temp = cards[middle].spriteVector;
-                cards[middle].spriteVector = cards[cards.Length - 1].spriteVector;
-                cards[cards.Length - 1].spriteVector = temp;
-            }
-            else
-            {
-                players[0].FixList(cards);
-                sort = false;
-            }
 
+            if (!sort) {
+                var temp = cards[middle].spriteVector;
+                cards[middle].spriteVector = cards[cards.Count - 1].spriteVector;
+                cards[cards.Count - 1].spriteVector = temp;
+            } 
+            sort = false;
         }
 
         private void GetTableCardLocationForAnimation() {
