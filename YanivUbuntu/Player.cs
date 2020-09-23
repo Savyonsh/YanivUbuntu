@@ -2,29 +2,26 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace YanivUbuntu
-{
-    internal class Player
-    {
+namespace YanivUbuntu{
+    internal class Player{
         // Personal Details
-        private string playerName;
+        public string PlayerName { get; set; }
         public int PlayerNumber { get; }
         public int Score { get; private set; }
-        
+
         // Game Details
         public List<Card> Cards { get; }
         public List<Card> ClubsCards { get; }
         public List<Card> DiamondCards { get; }
         public List<Card> HeartsCards { get; }
         public List<Card> SpadesCards { get; }
-        public List<Card> JokerCards { get;}
+        public List<Card> JokerCards { get; }
         public List<Card> PickedCards { get; private set; }
         public List<List<Card>> OrganizedCards { get; }
 
-        public Player(int number, string name)
-        { 
+        public Player(int number, string name) {
             PlayerNumber = number;
-            playerName = name;
+            PlayerName = name;
             Score = 0;
             Cards = new List<Card>();
             ClubsCards = new List<Card>();
@@ -37,14 +34,12 @@ namespace YanivUbuntu
                 ClubsCards, HeartsCards, SpadesCards, DiamondCards
             };
         }
-        public void SetCards(List<Card> cards)
-        {
-            foreach (Card card in cards)
-            {
+
+        public void SetCards(List<Card> cards) {
+            foreach (Card card in cards) {
                 Cards.Add(card);
                 card.CardState = CardState.NONE;
-                switch(card.CardShape)
-                {
+                switch (card.CardShape) {
                     case Shapes.CLUBS:
                         ClubsCards.Add(card);
                         break;
@@ -63,39 +58,32 @@ namespace YanivUbuntu
                 }
             }
         }
-        
-        
 
-        public int CardSum()
-        {
-            return Card.CardSum(Cards);
-        }
-        public void PickCard(Card card)
-        {
-            if (card.Picked)
-            {
+
+
+        public int CardSum() { return Card.CardSum(Cards); }
+
+        public void PickCard(Card card) {
+            if (card.Picked) {
                 card.Picked = false;
                 PickedCards.Remove(card);
                 PickedCards.Sort();
                 card.CardState = CardState.PUT_DOWN;
-            }
-            else
-            {
+            } else {
                 card.Picked = true;
                 PickedCards.Sort();
-                if (card.CardShape == Shapes.JOKER)
-                {
+                if (card.CardShape == Shapes.JOKER) {
                     if (PickedCards.Count > 0)
                         card.CardValue = PickedCards[PickedCards.Count - 1].CardValue + 1;
                     else card.CardValue = 0;
                 }
+
                 PickedCards.Add(card);
                 card.CardState = CardState.LIFT;
             }
         }
 
-        public void ResetPlayer()
-        {
+        public void ResetPlayer() {
             Cards.Clear();
             ClubsCards.Clear();
             DiamondCards.Clear();
@@ -105,13 +93,11 @@ namespace YanivUbuntu
             PickedCards.Clear();
         }
 
-        public List<Card> Play(Card newCard)
-        {
+        public List<Card> Play(Card newCard) {
             var thrownCards = new List<Card>(PickedCards);
-        //   thrownCards.Sort();
-            
-            foreach (var pCard in PickedCards)
-            {
+            //   thrownCards.Sort();
+
+            foreach (var pCard in PickedCards) {
                 Cards.Remove(pCard);
                 ClubsCards.Remove(pCard);
                 SpadesCards.Remove(pCard);
@@ -121,34 +107,26 @@ namespace YanivUbuntu
                 pCard.Picked = false;
 
             }
+
             PickedCards.Clear();
-            SetCards(new List<Card>{newCard});
+            SetCards(new List<Card> {newCard});
             return thrownCards;
         }
 
-        public void ScorePlayer(bool penalty)
-        {
-            Score += CardSum();
+        public void ScorePlayer(bool penalty, bool caller) {
+            if(!caller || penalty)
+                Score += CardSum();
             if (penalty) Score += 30;
-            if (Score == 50) Score = 0; 
+            if (Score == 50) Score = 0;
             else if (Score % 50 == 0) Score /= 2;
         }
 
-        public void PickCards(List<Card> cards)
-        {
+        public void PickCards(List<Card> cards) {
             PickedCards = cards;
             foreach (var card in cards)
                 card.Picked = true;
         }
-
-        public void UnpickPickedCards()
-        {
-            foreach (var card in PickedCards)
-                card.Picked = false;
-            
-            PickedCards.Clear();
-        }
     }
-    
-    
+
+
 }

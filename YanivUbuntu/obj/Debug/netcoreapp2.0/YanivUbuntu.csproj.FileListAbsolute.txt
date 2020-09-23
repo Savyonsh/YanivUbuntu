@@ -6,7 +6,6 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/player2Turn.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/callIt.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/player1.xnb
-/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backgroundLight.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/card.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/youWon.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/throwCard.xnb
@@ -21,7 +20,6 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/player2.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/CardsShuffle.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/player2Won.xnb
-/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backgroundEmpty.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/chooseCircleSmall.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/YanivUbuntu.deps.json
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/YanivUbuntu.runtimeconfig.json
@@ -43,3 +41,8 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Lidgren.Network.pdb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/obj/Debug/netcoreapp2.0/YanivUbuntu.csproj.CopyComplete
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backButton.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/startButton.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/textBox.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/textLetters.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/startButtonGlowing.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/gameScreen.xnb

@@ -6,8 +6,6 @@
   <SourceFiles>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/again.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/assaf.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backgroundEmpty.jpg</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backgroundLight.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/callIt.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cantTakeCard.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/card.png</File>
@@ -24,7 +22,6 @@
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2Turn.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2Won.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/sort.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startupScreen.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/throwCard.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/tookCard.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/yaniv.png</File>
@@ -33,5 +30,11 @@
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/score.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoreTitle.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/textLetters.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/textBox.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startButton.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startButtonGlowing.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/gameScreen.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startupScreen.jpg</File>
   </SourceFiles>
 </SourceFileCollection>
