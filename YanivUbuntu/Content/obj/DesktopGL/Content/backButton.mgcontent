@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</SourceFile>
-  <SourceTime>2020-09-23T11:03:28.6401124+03:00</SourceTime>
+  <SourceTime>2020-09-23T19:50:37.7382776+03:00</SourceTime>
   <DestFile>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/bin/DesktopGL/Content/backButton.xnb</DestFile>
-  <DestTime>2020-09-23T11:18:42.1068873+03:00</DestTime>
+  <DestTime>2020-09-23T19:55:14.6568404+03:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-01-13T19:18:14+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

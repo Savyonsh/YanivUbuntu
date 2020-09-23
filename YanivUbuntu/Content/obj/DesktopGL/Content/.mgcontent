@@ -4,39 +4,35 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/assaf.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/callIt.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cantTakeCard.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/card.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardLeftPlayer.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardRightPlayer.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/chooseCircleLarge.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/chooseCircleSmall.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/deckRedBack.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1Turn.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1Won.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2Turn.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player2Won.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/sort.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/throwCard.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/tookCard.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/yaniv.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/youWon.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/amount.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/score.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoreTitle.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/textLetters.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startButton.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startButtonGlowing.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/gameScreen.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startupScreen.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresTableSignGlow.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresTableSign.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresTableScreen.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButtonGlow.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/numbers.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/rightPlayerTurn.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/leftPlayerTurn.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/sortButton.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/callIt.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/assafCalling.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/yanivCalling.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/deckRedBack.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/gameScreen.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardsRightPlayer.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardsLeftPlayer.png</File>
   </SourceFiles>
 </SourceFileCollection>

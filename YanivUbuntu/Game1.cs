@@ -36,29 +36,28 @@ namespace YanivUbuntu
             startupScreen,
             scoresTableScreen,
             deckSprite,
-            player1Title,
-            player2Title,
-            yanivSign,
-            youWon,
             callIt,
             tookCard,
             sortButton,
             startButton,
-            scoresTableButton, backButton;
-        
+            scoresTableButton,
+            backButton,
+            leftPlayerTurnBoldSprite,
+            rightPlayerTurnBoldSprite;
+
         // TEXTURES
-        private Texture2D player1TitleBold,
-            player2TitleBold,
-            assafTexture,
-            player1Won,
-            player2Won,
+        private Texture2D
+            assafCallingTexture,
+            yanivCallingTexture,
             cantTakeCard,
             cardLeftPlayer,
             cardRightPlayer,
+            cardsLeftPlayer, 
+            cardsRightPlayer,
             startButtonGlowTexture,
             scoresTableGlowTexture,
             textLetters,
-            textNumbers, 
+            textNumbers,
             backButtonGlowTexture;
         
         // LISTS
@@ -74,6 +73,7 @@ namespace YanivUbuntu
         // VECTORS
         private readonly Vector2[] playersScoresVectors;
         private readonly Vector2 rotationVector;
+        private Vector2[] playersCallingVector;
         
         // BOOLEANS
         private bool sort,
@@ -89,11 +89,12 @@ namespace YanivUbuntu
         private int j1,
             i1,
             roundNumber = 1,
-            screenNumber = 0,
+            screenNumber,
             randomIndex,
             shape,
             value,
             winner,
+            caller,
             turnCounter,
             textIndex;
 
@@ -127,6 +128,9 @@ namespace YanivUbuntu
             scoresSpritesForTable = new List<List<Sprite>>();
             dateSpritesForTable = new List<List<Sprite>>();
             scoresAndNames = Diserialize();
+            scoresAndNames.Sort(((scores, other) => scores.Score - other.Score));
+            if(scoresAndNames.Count > 3)
+                scoresAndNames.RemoveRange(3, scoresAndNames.Count - 1);
 
             // VECTORS
             rotationVector = new Vector2((float)79 / 2, (float)123 / 2);
@@ -134,6 +138,11 @@ namespace YanivUbuntu
                 new Vector2(485, 410),
                 new Vector2(50, 100),
                 new Vector2(605, 100)
+            };
+            playersCallingVector = new[] {
+                new Vector2(130, 340),
+                new Vector2(110, 60),
+                new Vector2(340, 60)
             };
 
             for (var i = 0; i < 3; i++) {
@@ -218,7 +227,8 @@ namespace YanivUbuntu
         }
 
         private Card GenerateDeckCard() {
-            var index = random.Next(0, randomIndex);
+            if (randomIndex <= 0) randomIndex = 53;
+                var index = random.Next(0, randomIndex);
             shape = deck[index] / 13;
             value = deck[index] % 13;
             deck[index] = deck[randomIndex];
@@ -246,11 +256,10 @@ namespace YanivUbuntu
             backButton = new Sprite(Content.Load<Texture2D>("backButton"), new Vector2(240, 550));
             backButtonGlowTexture = Content.Load<Texture2D>("backButtonGlow");
             for (var i = 0; i < scoresAndNames.Count; i++) {
-                namesSpriteForTable.Add(GetSpriteListFromText(scoresAndNames[i].Name, 20, 255 + 100 * i));
-                scoresSpritesForTable.Add(GetSpriteListFromNumbers(scoresAndNames[i].Score, 360, 260 + 100 * i));
-                dateSpritesForTable.Add(GetSpriteListFromDate(scoresAndNames[i].Date, 450, 260 + 100 * i));
+                namesSpriteForTable.Add(GetSpriteListFromText(scoresAndNames[i].Name, 20, 255 + 65 * i));
+                scoresSpritesForTable.Add(GetSpriteListFromNumbers(scoresAndNames[i].Score, 360, 260 + 65 * i));
+                dateSpritesForTable.Add(GetSpriteListFromDate(scoresAndNames[i].Date, 450, 260 + 65 * i));
             }
-            
             // --- GAME SPRITES, TEXTURES AND SOUND ---
             gameScreen = new Sprite(Content.Load<Texture2D>("gameScreen"), Vector2.Zero);
             
@@ -260,31 +269,32 @@ namespace YanivUbuntu
             cantTakeCard = Content.Load<Texture2D>("cantTakeCard");
             cardLeftPlayer = Content.Load<Texture2D>("cardLeftPlayer");
             cardRightPlayer = Content.Load<Texture2D>("cardRightPlayer");
+            cardsLeftPlayer =Content.Load<Texture2D>("cardsLeftPlayer");
+            cardsRightPlayer = Content.Load<Texture2D>("cardsRightPlayer");
             cardShuffle = Content.Load<SoundEffect>("CardsShuffle");
             cardBeingThrown = Content.Load<SoundEffect>("CardThrown");
             
             // Signs
-            sumOfCardsFont = Content.Load<SpriteFont>("amount");
+            sumOfCardsFont = Content.Load<SpriteFont>("score");
             scoreTitle = Content.Load<SpriteFont>("scoreTitle");
-            player1Title = new Sprite(Content.Load<Texture2D>("player1"), new Vector2(10, 60));
-            player2Title = new Sprite(Content.Load<Texture2D>("player2"),new Vector2(530, 60));
-            player1TitleBold = Content.Load<Texture2D>("player1Turn");
-            player2TitleBold = Content.Load<Texture2D>("player2Turn");
-            yanivSign = new Sprite(Content.Load<Texture2D>("yaniv"),new Vector2(150, 200));
-            assafTexture = Content.Load<Texture2D>("assaf");
-            youWon = new Sprite(Content.Load<Texture2D>("youWon"), new Vector2(200, 330));
-            player1Won = Content.Load<Texture2D>("player1Won");
-            player2Won = Content.Load<Texture2D>("player2Won");
-            callIt = new Sprite(Content.Load<Texture2D>("callIt"), new Vector2(140, 390));
+            leftPlayerTurnBoldSprite = new Sprite(Content.Load<Texture2D>("leftPlayerTurn"), new Vector2(123, 130));
+            rightPlayerTurnBoldSprite = new Sprite(Content.Load<Texture2D>("rightPlayerTurn"), new Vector2(533, 130));
+            yanivCallingTexture = Content.Load<Texture2D>("yanivCalling");
+            assafCallingTexture = Content.Load<Texture2D>("assafCalling");
+            callIt = new Sprite(Content.Load<Texture2D>("callIt"), new Vector2(154, 415));
             
             // Buttons
-            sortButton = new Sprite(Content.Load<Texture2D>("sort"), new Vector2(312, 638)); }
+            sortButton = new Sprite(Content.Load<Texture2D>("sortButton"), new Vector2(321, 419)); }
 
-        protected override void Initialize() {             
+        protected override void Initialize() {
+            SetGameSettings();
+            base.Initialize();
+        }
+
+        private void SetGameSettings() {
             // SET STARTING VALUES 
             turnCounter = 0;
             winner = 4;
-            assaf = false;
             currentTime = 0f;
             i1 = 0;
             openingCardShufflePlayed = false;
@@ -299,18 +309,6 @@ namespace YanivUbuntu
                 Deal(player);
             } 
             PlaceCardsOnMat();
-            base.Initialize(); 
-
-        /*// DEBUG
-        players[1].ResetPlayer();
-        players[1].SetCards(new List<Card>() {
-            new Card(Shapes.CLUBS, 3, Content.Load<Texture2D>("card")),
-            new Card(Shapes.CLUBS, 5, Content.Load<Texture2D>("card")),
-            new Card(Shapes.DIAMONDS, 5, Content.Load<Texture2D>("card"))
-        });
-
-        players[0].Cards[0].CardValue = 4;
-        players[0].Cards[0].CardShape = Shapes.CLUBS;*/
         }
 
         protected override void Draw(GameTime gameTime) {
@@ -321,36 +319,25 @@ namespace YanivUbuntu
                 case 1: {
                     // gameScreen | Players Titles | Buttons | Scores Sign
                     spriteBatch.Draw(gameScreen.SpriteTexture, gameScreen.spriteRectangle, Color.White);
-                    spriteBatch.Draw(deckSprite.SpriteTexture, deckSprite.spriteVector, deckSprite.spriteRectangle,
-                        Color.White);
-                    spriteBatch.Draw(player1Title.SpriteTexture, player1Title.spriteVector,
-                        player1Title.spriteRectangle, Color.White);
-                    spriteBatch.Draw(player2Title.SpriteTexture, player2Title.spriteVector,
-                        player1Title.spriteRectangle, Color.White);
-                    spriteBatch.Draw(sortButton.SpriteTexture, sortButton.spriteVector,
-                        sortButton.spriteRectangle, Color.White);
-                    foreach (var vector in playersScoresVectors) {
-                        spriteBatch.DrawString(scoreTitle, "SCORE",
-                            vector, Color.White);
-                    }
-
-                    // Drawing player's name
-                    var loc = (5 * players[0].PlayerName.Length) / 2;
-                    spriteBatch.DrawString(scoreTitle, "NAME",
-                        playersScoresVectors[0] - Vector2.UnitX * 120 + Vector2.UnitX * loc, Color.White);
-                    spriteBatch.DrawString(sumOfCardsFont, players[0].PlayerName,
-                        playersScoresVectors[0] - Vector2.UnitX * 120 + Vector2.UnitY * 20, Color.Black);
-
                     // Highlighting a player's title on his turn
                     switch (turnCounter % 3) {
                         case 1:
-                            spriteBatch.Draw(player1TitleBold, player1Title.spriteVector,
-                                player1Title.spriteRectangle, Color.White);
+                            spriteBatch.Draw(leftPlayerTurnBoldSprite.SpriteTexture,
+                                leftPlayerTurnBoldSprite.spriteVector,
+                                leftPlayerTurnBoldSprite.spriteRectangle, Color.White);
                             break;
                         case 2:
-                            spriteBatch.Draw(player2TitleBold, player2Title.spriteVector,
-                                player1Title.spriteRectangle, Color.White);
+                            spriteBatch.Draw(rightPlayerTurnBoldSprite.SpriteTexture,
+                                rightPlayerTurnBoldSprite.spriteVector,
+                                rightPlayerTurnBoldSprite.spriteRectangle, Color.White);
                             break;
+                    }
+
+                    spriteBatch.Draw(deckSprite.SpriteTexture, deckSprite.spriteVector, deckSprite.spriteRectangle,
+                        Color.White);
+                    foreach (var vector in playersScoresVectors) {
+                        spriteBatch.DrawString(scoreTitle, "SCORE",
+                            vector, Color.White);
                     }
 
                     foreach (var player in players) {
@@ -363,6 +350,9 @@ namespace YanivUbuntu
                     if (players[0].CardSum() <= 7 && turnCounter % 3 == 0 && winner == 4)
                         spriteBatch.Draw(callIt.SpriteTexture, callIt.spriteVector,
                             callIt.spriteRectangle, Color.White);
+                    else if(winner == 4)
+                        spriteBatch.Draw(sortButton.SpriteTexture, sortButton.spriteVector,
+                            sortButton.spriteRectangle, Color.White);
 
                     // CARD PRINTING //
                     i1 = 0;
@@ -495,12 +485,6 @@ namespace YanivUbuntu
                                     for (i1 = players[i].Cards.Count - 1; i1 >= 0; i1--)
                                         spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
                                             null, Color.White);
-
-                                    // Debug
-                                    for (i1 = players[i].Cards.Count - 1; i1 >= 0; i1--)
-                                        spriteBatch.DrawString(scoreTitle, players[i].Cards[i1].ToString(),
-                                            playersCardsVectors[i - 1][i1], Color.White);
-
                                     break;
                                 }
                             }
@@ -508,45 +492,54 @@ namespace YanivUbuntu
                     }
 
                     if (winner < 4) {
-                        if (!assaf) {
-                            spriteBatch.Draw(yanivSign.SpriteTexture, yanivSign.spriteVector,
-                                yanivSign.spriteRectangle, Color.White);
-                            switch (winner) {
-                                case 0:
-                                    spriteBatch.Draw(youWon.SpriteTexture, youWon.spriteVector,
-                                        youWon.spriteRectangle, Color.White);
-                                    break;
-                                case 1:
-                                    spriteBatch.Draw(player1Won, youWon.spriteVector,
-                                        youWon.spriteRectangle, Color.White);
-                                    break;
-                                case 2:
-                                    spriteBatch.Draw(player2Won, youWon.spriteVector,
-                                        youWon.spriteRectangle, Color.White);
-                                    break;
-                            }
-                        } else {
-                            if (currentTime < 2.5f) {
-                                spriteBatch.Draw(yanivSign.SpriteTexture, yanivSign.spriteVector,
-                                    null, Color.White);
-                            } else {
-                                spriteBatch.Draw(assafTexture, yanivSign.spriteVector,
-                                    null, Color.White);
-                                switch (winner) {
-                                    case 0:
-                                        spriteBatch.Draw(youWon.SpriteTexture, youWon.spriteVector,
+                        spriteBatch.Draw(yanivCallingTexture, playersCallingVector[caller], null, Color.White);
+                        if (currentTime <= 2.5f) 
+                            switch (caller) {
+                                // Displaying players card after a yaniv has been called
+                                case 1: {
+                                    for (var i = 0; i < players[1].Cards.Count; i++)
+                                        spriteBatch.Draw(cardsLeftPlayer, playersCardsVectors[0][i],
+                                            new Rectangle((4 - (int) players[1].Cards[i].CardShape) * 123,
+                                                players[1].Cards[i].CardValue * 79, 123, 79), Color.White);
+                                    for (var i = players[2].Cards.Count - 1; i >= 0; i--)
+                                        spriteBatch.Draw(cardRightPlayer, playersCardsVectors[1][i],
                                             null, Color.White);
-                                        break;
-                                    case 1:
-                                        spriteBatch.Draw(player1Won, youWon.spriteVector,
+                                    break;
+                                }
+                                case 2: {
+                                    for (var i = 0; i < players[2].Cards.Count; i++)
+                                        spriteBatch.Draw(cardsRightPlayer, playersCardsVectors[1][i],
+                                            new Rectangle((int) players[2].Cards[i].CardShape * 123,
+                                                79 * (12 - players[2].Cards[i].CardValue), 123, 79), Color.White);
+                                    for (var i = players[1].Cards.Count - 1; i >= 0; i--)
+                                        spriteBatch.Draw(cardRightPlayer, playersCardsVectors[0][i],
                                             null, Color.White);
-                                        break;
-                                    case 2:
-                                        spriteBatch.Draw(player2Won, youWon.spriteVector,
-                                            null, Color.White);
-                                        break;
+                                    break;
+                                }
+                                default: {
+                                    for (var j = 1; j < 3; j++) {
+                                        for (var i = players[j].Cards.Count - 1; i >= 0; i--)
+                                            spriteBatch.Draw(cardRightPlayer, playersCardsVectors[j - 1][i],
+                                                null, Color.White);
+                                    }
+
+                                    break;
                                 }
                             }
+
+                        if (currentTime > 2.5f) {
+                            if (winner != caller)
+                                spriteBatch.Draw(assafCallingTexture, playersCallingVector[winner], null, Color.White);
+                            // Displaying players card after a yaniv has been called
+                            for (var i = 0; i < players[1].Cards.Count; i++)
+                                spriteBatch.Draw(cardsLeftPlayer, playersCardsVectors[0][i],
+                                    new Rectangle((4 - (int) players[1].Cards[i].CardShape) * 123,
+                                        players[1].Cards[i].CardValue * 79, 123, 79), Color.White);
+
+                            for (var i = 0; i < players[2].Cards.Count; i++)
+                                spriteBatch.Draw(cardsRightPlayer, playersCardsVectors[1][i],
+                                    new Rectangle((int) players[2].Cards[i].CardShape * 123,
+                                        79 * (12 - players[2].Cards[i].CardValue), 123, 79), Color.White);
 
                         }
 
@@ -554,28 +547,12 @@ namespace YanivUbuntu
                             roundNumber--;
                             if (roundNumber <= 0) {
                                 AddScoreToTable();
-                                screenNumber = 0;
-                            }
-
+                                screenNumber = 2;
+                            } 
+                            SetGameSettings();
                             spriteBatch.End();
                             base.Draw(gameTime);
-                            Initialize();
                             return;
-                        }
-
-                        // Displaying players card after a yaniv has been called
-                        for (var j = 0; j < players[1].Cards.Count; j++)
-                            spriteBatch.Draw(players[1].Cards[j].SpriteTexture,
-                                playersCardsVectors[0][j] + (Vector2.UnitY * 35) + (Vector2.UnitX * 45),
-                                players[1].Cards[j].spriteRectangle, Color.White, MathHelper.PiOver2,
-                                rotationVector, 1, SpriteEffects.None, 0);
-
-                        if (players.Count > 2) {
-                            for (var j = players[2].Cards.Count - 1; j >= 0; j--)
-                                spriteBatch.Draw(players[2].Cards[j].SpriteTexture,
-                                    playersCardsVectors[1][j] + (Vector2.UnitY * 35) + (Vector2.UnitX * 55),
-                                    players[2].Cards[j].spriteRectangle, Color.White, MathHelper.PiOver2,
-                                    rotationVector, 1, SpriteEffects.None, 0);
                         }
                     }
 
@@ -600,16 +577,12 @@ namespace YanivUbuntu
                     spriteBatch.Draw(backButtonGlow ? backButtonGlowTexture : backButton.SpriteTexture,
                         backButton.spriteVector, null, Color.White);
                     // Print names and scores in table
-                    foreach (var letter in namesSpriteForTable.SelectMany(namesSprite => namesSprite))
-                        spriteBatch.Draw(letter.SpriteTexture, letter.spriteVector, letter.spriteRectangle,
-                            Color.White);
-                    foreach (var score in scoresSpritesForTable.SelectMany(namesSprite => namesSprite))
-                        spriteBatch.Draw(score.SpriteTexture, score.spriteVector, score.spriteRectangle,
-                            Color.White);
-                    foreach (var date in dateSpritesForTable.SelectMany(namesSprite => namesSprite))
-                        spriteBatch.Draw(date.SpriteTexture, date.spriteVector, date.spriteRectangle,
-                            Color.White);
-
+                    foreach (var name in namesSpriteForTable.SelectMany(names => names))
+                        spriteBatch.Draw(name.SpriteTexture, name.spriteVector, name.spriteRectangle, Color.White);
+                    foreach (var score in scoresSpritesForTable.SelectMany(scores => scores))
+                        spriteBatch.Draw(score.SpriteTexture, score.spriteVector, score.spriteRectangle, Color.White);
+                    foreach (var date in dateSpritesForTable.SelectMany(dates => dates))
+                        spriteBatch.Draw(date.SpriteTexture, date.spriteVector, date.spriteRectangle, Color.White);
                     break;
                 }
             }
@@ -619,13 +592,18 @@ namespace YanivUbuntu
         }
 
         private void AddScoreToTable() {
-            scoresAndNames.Add(new NamesAndScores() {
+            var newScore = new NamesAndScores() {
                 Name = players[0].PlayerName, Score = players[0].Score,
                 Date = DateTime.Today.ToShortDateString()
-            });
-            namesSpriteForTable.Add(GetSpriteListFromText(scoresAndNames[scoresAndNames.Count - 1].Name, 200, 255 + 100 * scoresAndNames.Count - 1));
-            scoresSpritesForTable.Add(GetSpriteListFromNumbers(scoresAndNames[scoresAndNames.Count - 1].Score, 360, 260 + 100 * scoresAndNames.Count - 1));
-            dateSpritesForTable.Add(GetSpriteListFromDate(scoresAndNames[scoresAndNames.Count - 1].Date, 450, 260 + 100 * scoresAndNames.Count - 1));
+            };
+            var tableIndex = scoresAndNames.Count;
+            scoresAndNames.Add(newScore);
+            namesSpriteForTable.Add(GetSpriteListFromText(newScore.Name, 20,
+                255 + 65 * tableIndex));
+            scoresSpritesForTable.Add(GetSpriteListFromNumbers(newScore.Score, 360,
+                260 + 65 * tableIndex));
+            dateSpritesForTable.Add(GetSpriteListFromDate(newScore.Date, 450,
+                260 + 65 * tableIndex));
         }
 
         protected override void UnloadContent() { }
@@ -641,6 +619,7 @@ namespace YanivUbuntu
             mouseCurrent = Mouse.GetState();
             keyboardStatePrevious = keyboardStateCurrent;
             keyboardStateCurrent = Keyboard.GetState();
+
             switch (screenNumber % 3) {
                 case 1: {
                     if (players[0].PlayerName.Equals(string.Empty))
@@ -756,10 +735,7 @@ namespace YanivUbuntu
 
             base.Update(gameTime);
         }
-
-        private void GetScoresAndNamesForTable() {
-            
-        }
+        
 
         private void Serialize(List<NamesAndScores> namesAndScoresList) {
             IFormatter formatter = new BinaryFormatter();
@@ -869,8 +845,6 @@ namespace YanivUbuntu
                 var currentSum = Card.CardSum(series);
                 if (currentSum > seriesWithoutTableCardSum) seriesWithoutTableCardSum = currentSum;
                 else continue;
-                /*doThrow.Clear();
-                doThrow.AddRange(series);*/
                 doThrow = series;
             }
             
@@ -927,49 +901,21 @@ namespace YanivUbuntu
                 seriesWithTableCardSum = Card.CardSum(shapeCards);
                 if (!shapeCards.Contains(card) || seriesWithTableCardSum <= seriesWithoutTableCardSum) continue;
                 // Throwing series next turn with the new card
-                /*doNotThrow.Clear();
-                doNotThrow.AddRange(shapeCards);*/
                 cardToTake = card;
                 doNotThrow = shapeCards;
-                /*// Check if there is a series after removing cards that
-                // are going to be thrown at the next round
-                doThrow.RemoveAll(tCard => shapeCards.Contains(tCard));
-                doThrow = CheckSeries(doThrow);
-                // Check if there are cards in the optional throwing
-                optionalThrow.RemoveAll(tCard => shapeCards.Contains(tCard));*/
             }
             
             // Check if one of the table cards exists in players cards.
-            //if (cardToTake == null) {
-                foreach (var tableCard in allowedToTake) {
+            foreach (var tableCard in allowedToTake) {
                     var allAppearances = player.Cards.FindAll(card => card.CompareTo(tableCard) == 0);
-                    /*if (allAppearances.Count * tableCard.CardValue > seriesWithoutTableCardSum) {
-                        // Check if there is a series after removing cards that
-                        // are going to be thrown at the next round
-                        doThrow.RemoveAll(card => allAppearances.Contains(card));
-                        doThrow = CheckSeries(doThrow);
-                        // Remove the optionalThrow if it contains the cards that 
-                        // are going to be thrown at the next round
-                        cardToTake = tableCard;
-                    } 
-                    // Check if the player should keep the card for series or the same-value cards
-                    if (optionalThrow.Exists(card => card.CompareTo(tableCard) == 0) &&
-                        allAppearances.Count * tableCard.CardValue > seriesWithTableCardSum) {
-                        doNotThrow.Clear();
-                        doNotThrow.AddRange(allAppearances);
-                        optionalThrow.Clear();
-                        cardToTake = tableCard;
-                    }*/
-                    if (allAppearances.Count * tableCard.CardValue > seriesWithoutTableCardSum ||
-                        (optionalThrow.Exists(card => card.CompareTo(tableCard) == 0) &&
-                         allAppearances.Count * tableCard.CardValue > seriesWithTableCardSum)) {
-                        doNotThrow = allAppearances;
-                        cardToTake = tableCard;
-                    }
+                    if (allAppearances.Count * tableCard.CardValue <= seriesWithoutTableCardSum &&
+                        (!optionalThrow.Exists(card => card.CompareTo(tableCard) == 0) ||
+                         allAppearances.Count * tableCard.CardValue <= seriesWithTableCardSum)) continue;
+                    doNotThrow = allAppearances;
+                    cardToTake = tableCard;
                 }
-           // }
-            
-            // If the cards on the table don't fit a double throw or a series completion
+
+                // If the cards on the table don't fit a double throw or a series completion
             // check if one of the table cards has a small value
             if (cardToTake == null) 
                 foreach (var tableCard in allowedToTake.Where(tableCard => tableCard.CardValue <= 2).Where(tableCard =>
@@ -1010,6 +956,7 @@ namespace YanivUbuntu
         }
 
         private void CheckWhoIsTheWinner(Player player) {
+            caller = player.PlayerNumber;
             var minSum = int.MaxValue;
             var winnerNumber = 0;
             foreach (var p in players.Where(p => minSum > p.CardSum())) {
@@ -1084,6 +1031,8 @@ namespace YanivUbuntu
         }
 
         private void PlaceCardsOnMat() {
+            if(players.Count == 0 || players[0].Cards.Count == 0) return;
+            
             var cards = players[0].Cards;
             
             // Fix jokers value
