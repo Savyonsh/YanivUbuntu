@@ -1,3 +1,4 @@
+using System;
 using System.Drawing;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,6 +7,7 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace YanivUbuntu
 {
+    [Serializable]
     public class Sprite{
         public Texture2D SpriteTexture { get; set; }
         public Rectangle spriteRectangle;

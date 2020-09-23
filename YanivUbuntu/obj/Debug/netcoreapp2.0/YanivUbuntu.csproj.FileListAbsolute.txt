@@ -13,7 +13,6 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/deckRedBack.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/sort.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/tookCard.xnb
-/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/again.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/cantTakeCard.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/cardLeftPlayer.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/cardRightPlayer.xnb
@@ -32,7 +31,6 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/obj/Debug/netcoreapp2.0/YanivUbuntu.AssemblyInfo.cs
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/obj/Debug/netcoreapp2.0/YanivUbuntu.dll
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/obj/Debug/netcoreapp2.0/YanivUbuntu.pdb
-/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/fddsf.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/assaf.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoreTitle.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/amount.xnb
@@ -42,7 +40,13 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/obj/Debug/netcoreapp2.0/YanivUbuntu.csproj.CopyComplete
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backButton.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/startButton.xnb
-/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/textBox.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/textLetters.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/startButtonGlowing.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/gameScreen.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoreTableSign.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoreTableSignGlow.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoresTableSign.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoresTableSignGlow.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoresTableScreen.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backButtonGlow.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/numbers.xnb

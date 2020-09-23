@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startupScreen.jpg</SourceFile>
-  <SourceTime>2020-09-22T18:20:44.5396961+03:00</SourceTime>
+  <SourceTime>2020-09-23T10:38:50.4140482+03:00</SourceTime>
   <DestFile>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/bin/DesktopGL/Content/startupScreen.xnb</DestFile>
-  <DestTime>2020-09-22T20:33:56.3224128+03:00</DestTime>
+  <DestTime>2020-09-23T10:40:06.4662658+03:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2018-01-13T19:18:14+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>

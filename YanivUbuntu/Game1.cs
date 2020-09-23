@@ -1,15 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Vector2 = Microsoft.Xna.Framework.Vector2;
 
 namespace YanivUbuntu
 {
     public enum CardDrawing { DECK, LEFT, RIGHT, NONE }
     public enum CardState { LIFT, PUT_DOWN, HOVER_UP, HOVER_DOWN, NONE}
+    
+    [Serializable] 
+    public class NamesAndScores {
+        public string Name { get; set; }
+        public int Score { get; set; }
+        public string Date { get; set; }
+        
+        public NamesAndScores(){}
+        
+    }
+
     public class Game1 : Game
     {
         // SPRITES
@@ -18,6 +34,7 @@ namespace YanivUbuntu
 
         private Sprite gameScreen,
             startupScreen,
+            scoresTableScreen,
             deckSprite,
             player1Title,
             player2Title,
@@ -26,8 +43,8 @@ namespace YanivUbuntu
             callIt,
             tookCard,
             sortButton,
-            textBox,
-            startButton;
+            startButton,
+            scoresTableButton, backButton;
         
         // TEXTURES
         private Texture2D player1TitleBold,
@@ -39,7 +56,10 @@ namespace YanivUbuntu
             cardLeftPlayer,
             cardRightPlayer,
             startButtonGlowTexture,
-            textLetters;
+            scoresTableGlowTexture,
+            textLetters,
+            textNumbers, 
+            backButtonGlowTexture;
         
         // LISTS
         private List<Player> players;
@@ -47,6 +67,9 @@ namespace YanivUbuntu
         private List<CardDrawing> playersCardDrawings;
         private readonly List<Card> tableCards;
         private List<Sprite> typedName;
+        private List<NamesAndScores> scoresAndNames;
+        private List<List<Sprite>> namesSpriteForTable, scoresSpritesForTable, dateSpritesForTable;
+
 
         // VECTORS
         private readonly Vector2[] playersScoresVectors;
@@ -54,16 +77,19 @@ namespace YanivUbuntu
         
         // BOOLEANS
         private bool sort,
-            startGame,
             openingCardShufflePlayed,
             startButtonGlow,
+            scoresTableButtonGlow,
+            backButtonGlow,
             assaf;
         
         // INTEGERS
         private int[] deck;
 
-        private int j1, i1,
-            roundNumber = 3,
+        private int j1,
+            i1,
+            roundNumber = 1,
+            screenNumber = 0,
             randomIndex,
             shape,
             value,
@@ -97,7 +123,11 @@ namespace YanivUbuntu
             playersCardDrawings = new List<CardDrawing>();
             playersCardsVectors = new List<Vector2[]>();
             typedName = new List<Sprite>();
-            
+            namesSpriteForTable = new List<List<Sprite>>();
+            scoresSpritesForTable = new List<List<Sprite>>();
+            dateSpritesForTable = new List<List<Sprite>>();
+            scoresAndNames = Diserialize();
+
             // VECTORS
             rotationVector = new Vector2((float)79 / 2, (float)123 / 2);
             playersScoresVectors = new[] {
@@ -120,6 +150,67 @@ namespace YanivUbuntu
             tookCard.spriteRectangle.Y = 215;
         }
 
+        private List<Sprite> GetSpriteListFromText(string text, float xPos, float yPos) {
+            var letterIndex = 0;
+            var ret = text.ToUpper().Select(letter => letter - 65).Select(i =>
+                    new Sprite(textLetters, new Vector2(xPos + (letterIndex += 40), yPos), new Rectangle(i * 40, 0, 40, 45)))
+                .ToList();
+            return ret;
+        }
+
+        private List<Sprite> GetSpriteListFromNumbers(int number, float xPos, float yPos) {
+            var numberIndex = 0;
+            var spriteList = new List<Sprite>();
+            do {
+                var div = number % 10;
+                number /= 10;
+                spriteList.Insert(0, new Sprite(textNumbers, Vector2.Zero,
+                    new Rectangle(div == 0 ? textNumbers.Width - 48 : (div - 1) * 24 , 0, 24, 31)));
+            } while (number > 0);
+
+            foreach (var spriteNumber in spriteList)
+                spriteNumber.spriteVector = new Vector2(xPos + (numberIndex += 24), yPos);
+            
+            return spriteList;
+        }
+
+        private List<Sprite> GetSpriteListFromDate(string date, float xPos, float yPos) {
+            var numberIndex = 0;
+            var splitDate = date.Split('/');
+            if (splitDate.Length < 3) return new List<Sprite>();
+            // Replacing month and day location
+            var temp = splitDate[0];
+            splitDate[0] = splitDate[1];
+            splitDate[1] = temp;
+            var spriteList = new List<Sprite>();
+            for (var i = splitDate.Length - 1; i >= 0; i--) {
+                var number = int.Parse(splitDate[i]);
+                // Digits
+                do {
+                    var div = number % 10;
+                    number /= 10;
+                    spriteList.Insert(0, new Sprite(textNumbers, Vector2.Zero,
+                        new Rectangle(div == 0 ? textNumbers.Width - 48 : (div - 1) * 24, 0, 24, 31)));
+                } while (number > 0);
+
+                // The separator '/'
+                if (i > 0)
+                    spriteList.Insert(0, new Sprite(textNumbers, Vector2.Zero,
+                        new Rectangle(textNumbers.Width - 24, 0, 24, 31)));
+            }
+
+            foreach (var sprite in spriteList)
+                sprite.spriteVector = new Vector2(xPos + (numberIndex += 24), yPos);
+
+            return spriteList;
+
+        }
+
+        private string GetTextFromSpriteList(List<Sprite> spriteList) {
+            return new string(spriteList
+                .Select(spriteLetter => (char) ((spriteLetter.spriteRectangle.X / 40) + 65)).ToArray());
+        }
+
         private void PlaceTableCard() {
             var tableCard = GenerateDeckCard();
             tableCard.spriteVector = Vector2.UnitX * 310 + Vector2.UnitY * 220;
@@ -136,17 +227,29 @@ namespace YanivUbuntu
             return card;
         }
 
-        protected override void LoadContent()
-        {
+        protected override void LoadContent() {
             spriteBatch = new SpriteBatch(GraphicsDevice);
             
             // --- STARTUP SCREEN ---
             startupScreen = new Sprite(Content.Load<Texture2D>("startupScreen"), Vector2.Zero);
-            textBox = new Sprite(Content.Load<Texture2D>("textBox"),new Vector2(244, 365));
             textLetters = Content.Load<Texture2D>("textLetters");
-            startButton = new Sprite(Content.Load<Texture2D>("startButton"), new Vector2(213, 500));
+            startButton = new Sprite(Content.Load<Texture2D>("startButton"), new Vector2(200, 420));
             startButtonGlowTexture = Content.Load<Texture2D>("startButtonGlowing");
-            textIndex = (int)textBox.spriteVector.X - 25;
+            scoresTableButton = new Sprite(Content.Load<Texture2D>("scoresTableSign"),
+                new Vector2(100, 550));
+            scoresTableGlowTexture = Content.Load<Texture2D>("scoresTableSignGlow");
+            textIndex = 220;
+
+            // --- SCORES TABLE ---
+            scoresTableScreen = new Sprite(Content.Load<Texture2D>("scoresTableScreen"));
+            textNumbers = Content.Load<Texture2D>("numbers");
+            backButton = new Sprite(Content.Load<Texture2D>("backButton"), new Vector2(240, 550));
+            backButtonGlowTexture = Content.Load<Texture2D>("backButtonGlow");
+            for (var i = 0; i < scoresAndNames.Count; i++) {
+                namesSpriteForTable.Add(GetSpriteListFromText(scoresAndNames[i].Name, 20, 255 + 100 * i));
+                scoresSpritesForTable.Add(GetSpriteListFromNumbers(scoresAndNames[i].Score, 360, 260 + 100 * i));
+                dateSpritesForTable.Add(GetSpriteListFromDate(scoresAndNames[i].Date, 450, 260 + 100 * i));
+            }
             
             // --- GAME SPRITES, TEXTURES AND SOUND ---
             gameScreen = new Sprite(Content.Load<Texture2D>("gameScreen"), Vector2.Zero);
@@ -210,272 +313,304 @@ namespace YanivUbuntu
         players[0].Cards[0].CardShape = Shapes.CLUBS;*/
         }
 
-        protected override void Draw(GameTime gameTime)
-        {
+        protected override void Draw(GameTime gameTime) {
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
-            
-            if (startGame) {
-                // gameScreen | Players Titles | Buttons | Scores Sign
-                spriteBatch.Draw(gameScreen.SpriteTexture, gameScreen.spriteRectangle, Color.White);
-                spriteBatch.Draw(deckSprite.SpriteTexture, deckSprite.spriteVector, deckSprite.spriteRectangle,
-                    Color.White);
-                spriteBatch.Draw(player1Title.SpriteTexture, player1Title.spriteVector,
-                    player1Title.spriteRectangle, Color.White);
-                spriteBatch.Draw(player2Title.SpriteTexture, player2Title.spriteVector,
-                    player1Title.spriteRectangle, Color.White);
-                spriteBatch.Draw(sortButton.SpriteTexture, sortButton.spriteVector,
-                    sortButton.spriteRectangle, Color.White);
-                foreach (var vector in playersScoresVectors) {
-                    spriteBatch.DrawString(scoreTitle, "SCORE",
-                        vector, Color.White);
-                }
 
-                // Drawing player's name
-                var loc = (5 * players[0].PlayerName.Length) / 2;
-                spriteBatch.DrawString(scoreTitle,"NAME",
-                    playersScoresVectors[0] - Vector2.UnitX * 120 + Vector2.UnitX * loc, Color.White);
-                spriteBatch.DrawString(sumOfCardsFont, players[0].PlayerName,
-                    playersScoresVectors[0] - Vector2.UnitX * 120 + Vector2.UnitY * 20 , Color.Black);
-                
-                // Highlighting a player's title on his turn
-                switch (turnCounter % 3) {
-                    case 1:
-                        spriteBatch.Draw(player1TitleBold, player1Title.spriteVector,
-                            player1Title.spriteRectangle, Color.White);
-                        break;
-                    case 2:
-                        spriteBatch.Draw(player2TitleBold, player2Title.spriteVector,
-                            player1Title.spriteRectangle, Color.White);
-                        break;
-                }
-
-                foreach (var player in players) {
-                    spriteBatch.DrawString(sumOfCardsFont, player.Score.ToString(),
-                        playersScoresVectors[player.PlayerNumber] +
-                        Vector2.UnitY * 20 + Vector2.UnitX * 20, Color.Black);
-                }
-                
-                // Call it button
-                if (players[0].CardSum() <= 7 && turnCounter % 3 == 0 && winner == 4)
-                    spriteBatch.Draw(callIt.SpriteTexture, callIt.spriteVector,
-                        callIt.spriteRectangle, Color.White);
-
-                // CARD PRINTING //
-                i1 = 0;
-                foreach (var tableCard in tableCards) {
-                    spriteBatch.Draw(tableCard.SpriteTexture, tableCard.spriteVector, tableCard.spriteRectangle,
+            switch (screenNumber % 3) {
+                case 1: {
+                    // gameScreen | Players Titles | Buttons | Scores Sign
+                    spriteBatch.Draw(gameScreen.SpriteTexture, gameScreen.spriteRectangle, Color.White);
+                    spriteBatch.Draw(deckSprite.SpriteTexture, deckSprite.spriteVector, deckSprite.spriteRectangle,
                         Color.White);
-                    if (i1 != 0 && i1 != tableCards.Count - 1)
-                        spriteBatch.Draw(cantTakeCard, tableCard.spriteVector,
-                            null, Color.White);
-                    i1++;
-                }
+                    spriteBatch.Draw(player1Title.SpriteTexture, player1Title.spriteVector,
+                        player1Title.spriteRectangle, Color.White);
+                    spriteBatch.Draw(player2Title.SpriteTexture, player2Title.spriteVector,
+                        player1Title.spriteRectangle, Color.White);
+                    spriteBatch.Draw(sortButton.SpriteTexture, sortButton.spriteVector,
+                        sortButton.spriteRectangle, Color.White);
+                    foreach (var vector in playersScoresVectors) {
+                        spriteBatch.DrawString(scoreTitle, "SCORE",
+                            vector, Color.White);
+                    }
 
-                // Players cards (including animation)
-                for (var i = 0; i < 3; i++) {
-                    if (i == 0) {
-                        if (playersCardDrawings[i] != CardDrawing.NONE) {
-                            spriteBatch.Draw(deckCard.SpriteTexture, tookCard.spriteVector,
-                                tookCard.spriteRectangle, Color.White);
-                            if (tookCard.spriteVector.Y + 14.5f < 500)
-                                tookCard.spriteVector.Y += 14.5f;
-                            else {
-                                tookCard.spriteVector.Y = 60;
-                                playersCardDrawings[i] = CardDrawing.NONE;
+                    // Drawing player's name
+                    var loc = (5 * players[0].PlayerName.Length) / 2;
+                    spriteBatch.DrawString(scoreTitle, "NAME",
+                        playersScoresVectors[0] - Vector2.UnitX * 120 + Vector2.UnitX * loc, Color.White);
+                    spriteBatch.DrawString(sumOfCardsFont, players[0].PlayerName,
+                        playersScoresVectors[0] - Vector2.UnitX * 120 + Vector2.UnitY * 20, Color.Black);
+
+                    // Highlighting a player's title on his turn
+                    switch (turnCounter % 3) {
+                        case 1:
+                            spriteBatch.Draw(player1TitleBold, player1Title.spriteVector,
+                                player1Title.spriteRectangle, Color.White);
+                            break;
+                        case 2:
+                            spriteBatch.Draw(player2TitleBold, player2Title.spriteVector,
+                                player1Title.spriteRectangle, Color.White);
+                            break;
+                    }
+
+                    foreach (var player in players) {
+                        spriteBatch.DrawString(sumOfCardsFont, player.Score.ToString(),
+                            playersScoresVectors[player.PlayerNumber] +
+                            Vector2.UnitY * 20 + Vector2.UnitX * 20, Color.Black);
+                    }
+
+                    // Call it button
+                    if (players[0].CardSum() <= 7 && turnCounter % 3 == 0 && winner == 4)
+                        spriteBatch.Draw(callIt.SpriteTexture, callIt.spriteVector,
+                            callIt.spriteRectangle, Color.White);
+
+                    // CARD PRINTING //
+                    i1 = 0;
+                    foreach (var tableCard in tableCards) {
+                        spriteBatch.Draw(tableCard.SpriteTexture, tableCard.spriteVector, tableCard.spriteRectangle,
+                            Color.White);
+                        if (i1 != 0 && i1 != tableCards.Count - 1)
+                            spriteBatch.Draw(cantTakeCard, tableCard.spriteVector,
+                                null, Color.White);
+                        i1++;
+                    }
+
+                    // Players cards (including animation)
+                    for (var i = 0; i < 3; i++) {
+                        if (i == 0) {
+                            if (playersCardDrawings[i] != CardDrawing.NONE) {
+                                spriteBatch.Draw(deckCard.SpriteTexture, tookCard.spriteVector,
+                                    tookCard.spriteRectangle, Color.White);
+                                if (tookCard.spriteVector.Y + 14.5f < 500)
+                                    tookCard.spriteVector.Y += 14.5f;
+                                else {
+                                    tookCard.spriteVector.Y = 60;
+                                    playersCardDrawings[i] = CardDrawing.NONE;
+                                }
+
+                                for (var j = 0; j < players[i].Cards.Count - 1; j++)
+                                    spriteBatch.Draw(players[i].Cards[j].SpriteTexture,
+                                        players[i].Cards[j].spriteVector,
+                                        players[i].Cards[j].spriteRectangle, Color.White);
+                            } else {
+                                foreach (var card in players[i].Cards) {
+                                    switch (card.CardState) {
+                                        case CardState.LIFT:
+                                            if (card.spriteVector.Y > 450)
+                                                card.spriteVector.Y -= 10;
+                                            break;
+                                        case CardState.PUT_DOWN:
+                                            if (card.spriteVector.Y < 500)
+                                                card.spriteVector.Y += 10;
+                                            else card.CardState = CardState.NONE;
+                                            break;
+                                        case CardState.HOVER_UP:
+                                            if (card.spriteVector.Y > 490)
+                                                card.spriteVector.Y -= 5;
+                                            break;
+                                        case CardState.HOVER_DOWN:
+                                            if (card.spriteVector.Y < 500)
+                                                card.spriteVector.Y += 5;
+                                            else card.CardState = CardState.NONE;
+                                            break;
+                                    }
+
+                                    spriteBatch.Draw(card.SpriteTexture, card.spriteVector,
+                                        card.spriteRectangle, Color.White);
+                                }
                             }
-
-                            for (var j = 0; j < players[i].Cards.Count - 1; j++) 
-                                spriteBatch.Draw(players[i].Cards[j].SpriteTexture, players[i].Cards[j].spriteVector,
-                                    players[i].Cards[j].spriteRectangle, Color.White);
                         } else {
-                            foreach (var card in players[i].Cards) {
-                                switch (card.CardState) {
-                                    case CardState.LIFT:
-                                        if (card.spriteVector.Y > 450)
-                                            card.spriteVector.Y -= 10;
-                                        break;
-                                    case CardState.PUT_DOWN:
-                                        if (card.spriteVector.Y < 500)
-                                            card.spriteVector.Y += 10;
-                                        else card.CardState = CardState.NONE;
-                                        break;
-                                    case CardState.HOVER_UP:
-                                        if (card.spriteVector.Y > 490)
-                                            card.spriteVector.Y -= 5;
-                                        break;
-                                    case CardState.HOVER_DOWN:
-                                        if (card.spriteVector.Y < 500)
-                                            card.spriteVector.Y += 5;
-                                        else card.CardState = CardState.NONE;
-                                        break;
-                                }
-                                spriteBatch.Draw(card.SpriteTexture, card.spriteVector,
-                                    card.spriteRectangle, Color.White);
-                            }
-                        }
-                    } else {
-                        var rightTexture = i == 1 ? cardLeftPlayer : cardRightPlayer;
-                        var rightDirection = i == 1 ? -1 : 1;
-                        switch (playersCardDrawings[i]) {
-                            case CardDrawing.DECK: {
-                                if (j1 < 30) {
-                                    spriteBatch.Draw(tookCard.SpriteTexture, tookCard.spriteVector,
-                                        tookCard.spriteRectangle, Color.White, rotation,
-                                        rotationVector, 1.0f, SpriteEffects.None, 1.0f);
-                                    rotation += rightDirection * 0.06f;
-                                    j1++;
-                                } else {
-                                    tookCard.spriteVector.Y = playersCardsVectors[i - 1][0].Y;
-                                    spriteBatch.Draw(rightTexture, tookCard.spriteVector,
-                                        null, Color.White);
-                                    if (rightDirection == 1 && tookCard.spriteVector.X < playersCardsVectors[i - 1][0].X || 
-                                        rightDirection == -1 && tookCard.spriteVector.X > playersCardsVectors[i - 1][0].X)
-                                        tookCard.spriteVector.X += rightDirection * 14.5f;
-                                    else {
-                                        tookCard.spriteVector.X = deckSprite.spriteVector.X;
-                                        playersCardDrawings[i] = CardDrawing.NONE;
-                                        rotation = 0;
-                                        j1 = 0;
-                                    }
-                                }
-                                for (i1 = players[i].Cards.Count - 1; i1 > 0; i1--)
-                                    spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
-                                        null, Color.White);
-                                break;
-                            }
-                            case CardDrawing.RIGHT:
-                            case CardDrawing.LEFT:
-                                // Rotation of card
-                                if (j1 < 27) {
-                                    spriteBatch.Draw(tookCard.SpriteTexture, tookCard.spriteVector,
-                                        tookCard.spriteRectangle, Color.White, rotation,
-                                        rotationVector, 1.0f, SpriteEffects.None, 1.0f);
-                                    rotation += rightDirection * 0.06f;
-                                    j1++;
-                                } else {
-                                    // Arriving to players cards 
-                                    if (!(tookCard.spriteVector.X <=
-                                          (playersCardsVectors[i - 1][players[i].Cards.Count - 1].X +
-                                           rightTexture.Height)) && rightDirection == -1 ||
-                                        !(tookCard.spriteVector.X >=
-                                          (playersCardsVectors[i - 1][players[i].Cards.Count - 1].X +
-                                           rightTexture.Height)) && rightDirection == 1)
-                                    {
-                                        tookCard.spriteVector.X += rightDirection * 10.5f;
+                            var rightTexture = i == 1 ? cardLeftPlayer : cardRightPlayer;
+                            var rightDirection = i == 1 ? -1 : 1;
+                            switch (playersCardDrawings[i]) {
+                                case CardDrawing.DECK: {
+                                    if (j1 < 30) {
                                         spriteBatch.Draw(tookCard.SpriteTexture, tookCard.spriteVector,
-                                            tookCard.spriteRectangle, Color.White, rightDirection * 29.85f,
-                                            rotationVector,
-                                            1.0f, SpriteEffects.None, 1.0f);
+                                            tookCard.spriteRectangle, Color.White, rotation,
+                                            rotationVector, 1.0f, SpriteEffects.None, 1.0f);
+                                        rotation += rightDirection * 0.06f;
+                                        j1++;
                                     } else {
-                                        playersCardDrawings[i] = CardDrawing.NONE;
-                                        tookCard.spriteVector.X = deckSprite.spriteVector.X;
-                                        j1 = 0;
-                                        rotation = 0;
+                                        tookCard.spriteVector.Y = playersCardsVectors[i - 1][0].Y;
+                                        spriteBatch.Draw(rightTexture, tookCard.spriteVector,
+                                            null, Color.White);
+                                        if (rightDirection == 1 &&
+                                            tookCard.spriteVector.X < playersCardsVectors[i - 1][0].X ||
+                                            rightDirection == -1 &&
+                                            tookCard.spriteVector.X > playersCardsVectors[i - 1][0].X)
+                                            tookCard.spriteVector.X += rightDirection * 14.5f;
+                                        else {
+                                            tookCard.spriteVector.X = deckSprite.spriteVector.X;
+                                            playersCardDrawings[i] = CardDrawing.NONE;
+                                            rotation = 0;
+                                            j1 = 0;
+                                        }
                                     }
+
+                                    for (i1 = players[i].Cards.Count - 1; i1 > 0; i1--)
+                                        spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
+                                            null, Color.White);
+                                    break;
                                 }
-                                // Drawing all of players card excluding the last one -
-                                // as the animation arrives there. 
-                                for (i1 = players[i].Cards.Count - 2; i1 >= 0; i1--)
-                                    spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
-                                        null, Color.White);
-                                
-                                break;
-                            default: {
-                                if(winner < 4) break;
-                                // Drawing players cards.
-                                for (i1 = players[i].Cards.Count - 1; i1 >= 0; i1--)
-                                    spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
-                                        null, Color.White);
+                                case CardDrawing.RIGHT:
+                                case CardDrawing.LEFT:
+                                    // Rotation of card
+                                    if (j1 < 27) {
+                                        spriteBatch.Draw(tookCard.SpriteTexture, tookCard.spriteVector,
+                                            tookCard.spriteRectangle, Color.White, rotation,
+                                            rotationVector, 1.0f, SpriteEffects.None, 1.0f);
+                                        rotation += rightDirection * 0.06f;
+                                        j1++;
+                                    } else {
+                                        // Arriving to players cards 
+                                        if (!(tookCard.spriteVector.X <=
+                                              (playersCardsVectors[i - 1][players[i].Cards.Count - 1].X +
+                                               rightTexture.Height)) && rightDirection == -1 ||
+                                            !(tookCard.spriteVector.X >=
+                                              (playersCardsVectors[i - 1][players[i].Cards.Count - 1].X +
+                                               rightTexture.Height)) && rightDirection == 1) {
+                                            tookCard.spriteVector.X += rightDirection * 10.5f;
+                                            spriteBatch.Draw(tookCard.SpriteTexture, tookCard.spriteVector,
+                                                tookCard.spriteRectangle, Color.White, rightDirection * 29.85f,
+                                                rotationVector,
+                                                1.0f, SpriteEffects.None, 1.0f);
+                                        } else {
+                                            playersCardDrawings[i] = CardDrawing.NONE;
+                                            tookCard.spriteVector.X = deckSprite.spriteVector.X;
+                                            j1 = 0;
+                                            rotation = 0;
+                                        }
+                                    }
 
-                                // Debug
-                                for (i1 = players[i].Cards.Count - 1; i1 >= 0; i1--)
-                                    spriteBatch.DrawString(scoreTitle, players[i].Cards[i1].ToString(),
-                                        playersCardsVectors[i - 1][i1], Color.White);
+                                    // Drawing all of players card excluding the last one -
+                                    // as the animation arrives there. 
+                                    for (i1 = players[i].Cards.Count - 2; i1 >= 0; i1--)
+                                        spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
+                                            null, Color.White);
 
-                                break;
+                                    break;
+                                default: {
+                                    if (winner < 4) break;
+                                    // Drawing players cards.
+                                    for (i1 = players[i].Cards.Count - 1; i1 >= 0; i1--)
+                                        spriteBatch.Draw(rightTexture, playersCardsVectors[i - 1][i1],
+                                            null, Color.White);
+
+                                    // Debug
+                                    for (i1 = players[i].Cards.Count - 1; i1 >= 0; i1--)
+                                        spriteBatch.DrawString(scoreTitle, players[i].Cards[i1].ToString(),
+                                            playersCardsVectors[i - 1][i1], Color.White);
+
+                                    break;
+                                }
                             }
                         }
                     }
-                }
 
-                if (winner < 4) {
-                    if (!assaf) {
-                        spriteBatch.Draw(yanivSign.SpriteTexture, yanivSign.spriteVector,
-                            yanivSign.spriteRectangle, Color.White);
-                        switch (winner) {
-                            case 0:
-                                spriteBatch.Draw(youWon.SpriteTexture, youWon.spriteVector,
-                                    youWon.spriteRectangle, Color.White);
-                                break;
-                            case 1:
-                                spriteBatch.Draw(player1Won, youWon.spriteVector,
-                                    youWon.spriteRectangle, Color.White);
-                                break;
-                            case 2:
-                                spriteBatch.Draw(player2Won, youWon.spriteVector,
-                                    youWon.spriteRectangle, Color.White);
-                                break;
-                        }
-                    } else {
-                        if (currentTime < 2.5f) {
+                    if (winner < 4) {
+                        if (!assaf) {
                             spriteBatch.Draw(yanivSign.SpriteTexture, yanivSign.spriteVector,
-                                null, Color.White);
-                        } else {
-                            spriteBatch.Draw(assafTexture, yanivSign.spriteVector,
-                                null, Color.White);
+                                yanivSign.spriteRectangle, Color.White);
                             switch (winner) {
                                 case 0:
                                     spriteBatch.Draw(youWon.SpriteTexture, youWon.spriteVector,
-                                        null, Color.White);
+                                        youWon.spriteRectangle, Color.White);
                                     break;
                                 case 1:
                                     spriteBatch.Draw(player1Won, youWon.spriteVector,
-                                        null, Color.White);
+                                        youWon.spriteRectangle, Color.White);
                                     break;
                                 case 2:
                                     spriteBatch.Draw(player2Won, youWon.spriteVector,
-                                        null, Color.White);
+                                        youWon.spriteRectangle, Color.White);
                                     break;
                             }
+                        } else {
+                            if (currentTime < 2.5f) {
+                                spriteBatch.Draw(yanivSign.SpriteTexture, yanivSign.spriteVector,
+                                    null, Color.White);
+                            } else {
+                                spriteBatch.Draw(assafTexture, yanivSign.spriteVector,
+                                    null, Color.White);
+                                switch (winner) {
+                                    case 0:
+                                        spriteBatch.Draw(youWon.SpriteTexture, youWon.spriteVector,
+                                            null, Color.White);
+                                        break;
+                                    case 1:
+                                        spriteBatch.Draw(player1Won, youWon.spriteVector,
+                                            null, Color.White);
+                                        break;
+                                    case 2:
+                                        spriteBatch.Draw(player2Won, youWon.spriteVector,
+                                            null, Color.White);
+                                        break;
+                                }
+                            }
+
                         }
 
-                    }
+                        if (currentTime > 5f) {
+                            roundNumber--;
+                            if (roundNumber <= 0) {
+                                AddScoreToTable();
+                                screenNumber = 0;
+                            }
 
-                    if (currentTime > 5f) {
-                        roundNumber--;
-                        if (roundNumber <= 0) {
-                            Exit();
+                            spriteBatch.End();
+                            base.Draw(gameTime);
+                            Initialize();
+                            return;
                         }
-                        spriteBatch.End();
-                        base.Draw(gameTime);
-                        Initialize();
-                        return;
-                    }
 
-                    // Displaying players card after a yaniv has been called
-                    for (var j = 0; j < players[1].Cards.Count; j++)
-                        spriteBatch.Draw(players[1].Cards[j].SpriteTexture,
-                            playersCardsVectors[0][j] + (Vector2.UnitY * 35) + (Vector2.UnitX * 45),
-                            players[1].Cards[j].spriteRectangle, Color.White, MathHelper.PiOver2,
-                            rotationVector, 1, SpriteEffects.None, 0);
-
-                    if (players.Count > 2) {
-                        for (var j = players[2].Cards.Count - 1; j >= 0; j--)
-                            spriteBatch.Draw(players[2].Cards[j].SpriteTexture,
-                                playersCardsVectors[1][j] + (Vector2.UnitY * 35) + (Vector2.UnitX * 55),
-                                players[2].Cards[j].spriteRectangle, Color.White, MathHelper.PiOver2,
+                        // Displaying players card after a yaniv has been called
+                        for (var j = 0; j < players[1].Cards.Count; j++)
+                            spriteBatch.Draw(players[1].Cards[j].SpriteTexture,
+                                playersCardsVectors[0][j] + (Vector2.UnitY * 35) + (Vector2.UnitX * 45),
+                                players[1].Cards[j].spriteRectangle, Color.White, MathHelper.PiOver2,
                                 rotationVector, 1, SpriteEffects.None, 0);
+
+                        if (players.Count > 2) {
+                            for (var j = players[2].Cards.Count - 1; j >= 0; j--)
+                                spriteBatch.Draw(players[2].Cards[j].SpriteTexture,
+                                    playersCardsVectors[1][j] + (Vector2.UnitY * 35) + (Vector2.UnitX * 55),
+                                    players[2].Cards[j].spriteRectangle, Color.White, MathHelper.PiOver2,
+                                    rotationVector, 1, SpriteEffects.None, 0);
+                        }
                     }
+
+                    break;
                 }
-            } else {
-                // Displaying setting for game gameScreen
-                spriteBatch.Draw(startupScreen.SpriteTexture, Vector2.Zero, null, Color.White);
-                spriteBatch.Draw(textBox.SpriteTexture, textBox.spriteVector, null, Color.White);
-                spriteBatch.Draw(startButtonGlow ? startButtonGlowTexture : startButton.SpriteTexture,
-                    startButton.spriteVector, null, Color.White);
-                foreach (var letter in typedName) {
-                    spriteBatch.Draw(letter.SpriteTexture, letter.spriteVector, letter.spriteRectangle, Color.White);
+                case 0: {
+                    // Displaying setting for game gameScreen
+                    spriteBatch.Draw(startupScreen.SpriteTexture, Vector2.Zero, null, Color.White);
+                    spriteBatch.Draw(startButtonGlow ? startButtonGlowTexture : startButton.SpriteTexture,
+                        startButton.spriteVector, null, Color.White);
+                    spriteBatch.Draw(scoresTableButtonGlow ? scoresTableGlowTexture : scoresTableButton.SpriteTexture,
+                        scoresTableButton.spriteVector, null, Color.White);
+                    foreach (var letter in typedName) {
+                        spriteBatch.Draw(letter.SpriteTexture, letter.spriteVector, letter.spriteRectangle,
+                            Color.White);
+                    }
+
+                    break;
+                }
+                default: {
+                    spriteBatch.Draw(scoresTableScreen.SpriteTexture, Vector2.Zero, null, Color.White);
+                    spriteBatch.Draw(backButtonGlow ? backButtonGlowTexture : backButton.SpriteTexture,
+                        backButton.spriteVector, null, Color.White);
+                    // Print names and scores in table
+                    foreach (var letter in namesSpriteForTable.SelectMany(namesSprite => namesSprite))
+                        spriteBatch.Draw(letter.SpriteTexture, letter.spriteVector, letter.spriteRectangle,
+                            Color.White);
+                    foreach (var score in scoresSpritesForTable.SelectMany(namesSprite => namesSprite))
+                        spriteBatch.Draw(score.SpriteTexture, score.spriteVector, score.spriteRectangle,
+                            Color.White);
+                    foreach (var date in dateSpritesForTable.SelectMany(namesSprite => namesSprite))
+                        spriteBatch.Draw(date.SpriteTexture, date.spriteVector, date.spriteRectangle,
+                            Color.White);
+
+                    break;
                 }
             }
 
@@ -483,7 +618,22 @@ namespace YanivUbuntu
             base.Draw(gameTime);
         }
 
+        private void AddScoreToTable() {
+            scoresAndNames.Add(new NamesAndScores() {
+                Name = players[0].PlayerName, Score = players[0].Score,
+                Date = DateTime.Today.ToShortDateString()
+            });
+            namesSpriteForTable.Add(GetSpriteListFromText(scoresAndNames[scoresAndNames.Count - 1].Name, 200, 255 + 100 * scoresAndNames.Count - 1));
+            scoresSpritesForTable.Add(GetSpriteListFromNumbers(scoresAndNames[scoresAndNames.Count - 1].Score, 360, 260 + 100 * scoresAndNames.Count - 1));
+            dateSpritesForTable.Add(GetSpriteListFromDate(scoresAndNames[scoresAndNames.Count - 1].Date, 450, 260 + 100 * scoresAndNames.Count - 1));
+        }
+
         protected override void UnloadContent() { }
+
+        protected override void OnExiting(object sender, EventArgs args) {
+            Serialize(scoresAndNames);
+            base.OnExiting(sender, args);
+        }
 
         protected override void Update(GameTime gameTime) {
             currentTime += (float) gameTime.ElapsedGameTime.TotalSeconds;
@@ -491,109 +641,153 @@ namespace YanivUbuntu
             mouseCurrent = Mouse.GetState();
             keyboardStatePrevious = keyboardStateCurrent;
             keyboardStateCurrent = Keyboard.GetState();
-            if (startGame) {
-                if (players[0].PlayerName.Equals(string.Empty))
-                    players[0].PlayerName = new string(typedName
-                        .Select(spriteLetter => (char) ((spriteLetter.spriteRectangle.X / 40) + 65)).ToArray());
+            switch (screenNumber % 3) {
+                case 1: {
+                    if (players[0].PlayerName.Equals(string.Empty))
+                        players[0].PlayerName = GetTextFromSpriteList(typedName); 
 
-                // Play the card shuffle sound at the start of the game
-                if (!openingCardShufflePlayed) {
-                    cardShuffle.Play();
-                    openingCardShufflePlayed = true;
-                }
-
-                // If there is a winner for this game, Start a new one or close game
-                if (winner < 4) {
-                    base.Update(gameTime);
-                    return;
-                }
-
-                // Cards mouse hover animation
-                foreach (var card in players[0].Cards) {
-                    if (card.MouseHovered(mouseCurrent) && card.CardState != CardState.LIFT) {
-                        card.CardState = CardState.HOVER_UP;
-                    } else if (mouseCurrent != mousePrevious && card.CardState == CardState.HOVER_UP)
-                        card.CardState = CardState.HOVER_DOWN;
-                }
-
-                // Player's turn
-                if (turnCounter % 3 == 0) {
-                    if (sortButton.MouseTouched(mouseCurrent, mousePrevious)) {
-                        sort = true;
-                        PlaceCardsOnMat();
+                    // Play the card shuffle sound at the start of the game
+                    if (!openingCardShufflePlayed) {
+                        cardShuffle.Play();
+                        openingCardShufflePlayed = true;
                     }
 
-                    if (players[0].CardSum() <= 7 &&
-                        callIt.MouseTouched(mouseCurrent, mousePrevious)) {
-                        CheckWhoIsTheWinner(players[0]);
+                    // If there is a winner for this game, Start a new one or close game
+                    if (winner < 4) {
                         base.Update(gameTime);
                         return;
                     }
 
-                    // Clicking and picking cards to throw
-                    foreach (var c in players[0].Cards.Where(c => c.MouseTouched(mouseCurrent, mousePrevious)))
-                        players[0].PickCard(c);
+                    // Cards mouse hover animation
+                    foreach (var card in players[0].Cards) {
+                        if (card.MouseHovered(mouseCurrent) && card.CardState != CardState.LIFT) {
+                            card.CardState = CardState.HOVER_UP;
+                        } else if (mouseCurrent != mousePrevious && card.CardState == CardState.HOVER_UP)
+                            card.CardState = CardState.HOVER_DOWN;
+                    }
 
-                    // Clicking on one of the cards on the table
-                    if (tableCards[0].MouseTouched(mouseCurrent, mousePrevious) ||
-                        tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious) ||
-                        deckSprite.MouseTouched(mouseCurrent, mousePrevious)) {
-                        if (!CheckIfLegal(players[0].PickedCards)) {
+                    // Player's turn
+                    if (turnCounter % 3 == 0) {
+                        if (sortButton.MouseTouched(mouseCurrent, mousePrevious)) {
+                            sort = true;
+                            PlaceCardsOnMat();
+                        }
+
+                        if (players[0].CardSum() <= 7 &&
+                            callIt.MouseTouched(mouseCurrent, mousePrevious)) {
+                            CheckWhoIsTheWinner(players[0]);
                             base.Update(gameTime);
                             return;
                         }
 
-                        var index = tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
-                                    !tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
-                            ? 0
-                            : tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
-                              tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
-                                ? tableCards.Count - 1
-                                : !tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
+                        // Clicking and picking cards to throw
+                        foreach (var c in players[0].Cards.Where(c => c.MouseTouched(mouseCurrent, mousePrevious)))
+                            players[0].PickCard(c);
+
+                        // Clicking on one of the cards on the table
+                        if (tableCards[0].MouseTouched(mouseCurrent, mousePrevious) ||
+                            tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious) ||
+                            deckSprite.MouseTouched(mouseCurrent, mousePrevious)) {
+                            if (!CheckIfLegal(players[0].PickedCards)) {
+                                base.Update(gameTime);
+                                return;
+                            }
+
+                            var index = tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
+                                        !tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
+                                ? 0
+                                : tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
                                   tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
                                     ? tableCards.Count - 1
-                                    : -1;
+                                    : !tableCards[0].MouseTouched(mouseCurrent, mousePrevious) &&
+                                      tableCards[tableCards.Count - 1].MouseTouched(mouseCurrent, mousePrevious)
+                                        ? tableCards.Count - 1
+                                        : -1;
 
-                        var cardToTake = index == -1 ? GenerateDeckCard() : tableCards[index];
-                        tookCard.spriteRectangle = cardToTake.spriteRectangle;
-                        playersCardDrawings[0] = index == -1 ? CardDrawing.DECK :
-                            index == 0 ? CardDrawing.LEFT : CardDrawing.RIGHT;
-                        cardBeingThrown.CreateInstance().Play();
-                        ReplaceTableCards(players[0].Play(new Card(cardToTake)));
-                        PlaceCardsOnMat();
-                        turnCounter++;
-                        currentTime = 0;
+                            var cardToTake = index == -1 ? GenerateDeckCard() : tableCards[index];
+                            tookCard.spriteRectangle = cardToTake.spriteRectangle;
+                            playersCardDrawings[0] = index == -1 ? CardDrawing.DECK :
+                                index == 0 ? CardDrawing.LEFT : CardDrawing.RIGHT;
+                            cardBeingThrown.CreateInstance().Play();
+                            ReplaceTableCards(players[0].Play(new Card(cardToTake)));
+                            PlaceCardsOnMat();
+                            turnCounter++;
+                            currentTime = 0;
 
+                        }
+
+                        // Computer's turn
+                    } else {
+                        if (currentTime > 3.5f) {
+                            ComputerStrategy(players[turnCounter % 3]);
+                            turnCounter++;
+                            currentTime = 0f;
+                        }
                     }
 
-                    // Computer's turn
-                } else {
-                    if (currentTime > 3.5f) {
-                        ComputerStrategy(players[turnCounter % 3]);
-                        turnCounter++;
-                        currentTime = 0f;
+                    break;
+                }
+                case 0: {
+                    startButtonGlow = startButton.MouseHovered(mouseCurrent);
+                    scoresTableButtonGlow = scoresTableButton.MouseHovered(mouseCurrent);
+                    if (startButton.MouseTouched(mouseCurrent, mousePrevious)) screenNumber = 1;
+                    if (scoresTableButton.MouseTouched(mouseCurrent, mousePrevious)) screenNumber = 2;
+                    for (var i = 0; i < 27; i++) {
+                        var key = (Keys) (i + 65);
+                        if (keyboardStatePrevious.IsKeyDown(key) && keyboardStateCurrent.IsKeyUp(key) &&
+                            textIndex < 549)
+                            typedName.Add(new Sprite(textLetters, new Vector2(textIndex += 40, 360),
+                                new Rectangle(i * 40, 0, 40, 45)));
                     }
-                }
-            } else {
-                startButtonGlow = startButton.MouseHovered(mouseCurrent);
-                startGame = startButton.MouseTouched(mouseCurrent, mousePrevious);
-                for (var i = 0; i < 27; i++) {
-                    var key = (Keys) (i + 65);
-                    if (keyboardStatePrevious.IsKeyDown(key) && keyboardStateCurrent.IsKeyUp(key) &&
-                        textIndex < textBox.spriteRectangle.Width + textBox.spriteVector.X - 80)
-                        typedName.Add(new Sprite(textLetters, new Vector2(textIndex += 40, textBox.spriteVector.Y + 12),
-                            new Rectangle(i * 40, 0, 40, 45)));
-                }
 
-                if (keyboardStatePrevious.IsKeyDown(Keys.Back) && keyboardStateCurrent.IsKeyUp(Keys.Back) &&
-                    typedName.Count > 0) {
-                    typedName.RemoveAt(typedName.Count - 1);
-                    textIndex -= 40;
+                    if (keyboardStatePrevious.IsKeyDown(Keys.Back) && keyboardStateCurrent.IsKeyUp(Keys.Back) &&
+                        typedName.Count > 0) {
+                        typedName.RemoveAt(typedName.Count - 1);
+                        textIndex -= 40;
+                    }
+
+                    break;
                 }
+                default:
+                    if (backButton.MouseTouched(mouseCurrent, mousePrevious)) screenNumber = 0;
+                    backButtonGlow = backButton.MouseHovered(mouseCurrent);
+                    break;
             }
 
             base.Update(gameTime);
         }
+
+        private void GetScoresAndNamesForTable() {
+            
+        }
+
+        private void Serialize(List<NamesAndScores> namesAndScoresList) {
+            IFormatter formatter = new BinaryFormatter();
+            try {
+                Stream stream = new FileStream("namesAndScores.bin", FileMode.OpenOrCreate, FileAccess.Write, FileShare.None);
+                formatter.Serialize(stream, namesAndScoresList);
+                stream.Close();
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        private List<NamesAndScores> Diserialize() {
+            var list = new List<List<NamesAndScores>>();
+            IFormatter formatter = new BinaryFormatter();
+            try {
+                Stream stream = new FileStream("namesAndScores.bin", FileMode.Open, FileAccess.Read, FileShare.Read);
+                while (stream.Position < stream.Length) {
+                    var obj = (List<NamesAndScores>) formatter.Deserialize(stream);
+                    list.Add(obj);
+                }
+                stream.Close();
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+            }
+            return list.Count > 0 ? list[0] : new List<NamesAndScores>();
+        }
+
 
         private bool CheckIfLegal(List<Card> cards) {
             if (cards.Count == 0) return false;

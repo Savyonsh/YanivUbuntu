@@ -4,7 +4,6 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/again.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/assaf.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/callIt.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cantTakeCard.png</File>
@@ -14,7 +13,6 @@
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/chooseCircleLarge.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/chooseCircleSmall.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/deckRedBack.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/fddsf.psd</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1Turn.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/player1Won.png</File>
@@ -29,12 +27,16 @@
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/amount.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/score.spritefont</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoreTitle.spritefont</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/textLetters.png</File>
-    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/textBox.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startButton.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startButtonGlowing.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/gameScreen.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/startupScreen.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresTableSignGlow.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresTableSign.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresTableScreen.jpg</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButtonGlow.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backButton.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/numbers.png</File>
   </SourceFiles>
 </SourceFileCollection>
