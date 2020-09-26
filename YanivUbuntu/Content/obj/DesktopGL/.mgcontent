@@ -34,5 +34,12 @@
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/gameScreen.jpg</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardsRightPlayer.png</File>
     <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/cardsLeftPlayer.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/backOfCard.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/deck.png</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresFont.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/scoresSignFont.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/nameFont.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/tableFont.spritefont</File>
+    <File>/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/Content/enterNameSign.png</File>
   </SourceFiles>
 </SourceFileCollection>

@@ -46,3 +46,10 @@
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/assafCalling.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backButton.xnb
 /home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/deckRedBack.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/backOfCard.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/deck.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoresSignFont.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/scoresFont.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/nameFont.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/tableFont.xnb
+/home2/Workplace/CSharp Projects/YanivUbuntu/YanivUbuntu/bin/Debug/netcoreapp2.0/Content/enterNameSign.xnb
