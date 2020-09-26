@@ -110,6 +110,7 @@ namespace YanivUbuntu{
                 playersCardDrawings[i] = CardDrawing.NONE;
             }
             scoresTable = Deserialized();
+            scoresTable.Sort((score, other) => score.Score - other.Score);
 
             // VECTORS
             rotationVector = new Vector2((float) 79 / 2, (float) 123 / 2);
@@ -142,12 +143,12 @@ namespace YanivUbuntu{
         protected override void Initialize() {
             base.Initialize();
             screenNumber = 0;
-            roundNumber = 3;
             SetGameSettings();
         }
 
         private void SetGameSettings() {
             // SET STARTING VALUES 
+            if(roundNumber == 0) roundNumber = 1;
             winner = 4;
             currentTime = 0f;
             openingCardShufflePlayed = false;
@@ -165,6 +166,8 @@ namespace YanivUbuntu{
                 playersCardsVectors[i].Clear();
                 players[i].ResetPlayer();
                 Deal(players[i]);
+                if (roundNumber == 1)
+                    players[i].Score = 0;
             }
 
             for (var k = 0; k < 7; k++) {
@@ -308,7 +311,7 @@ namespace YanivUbuntu{
                         spriteBatch.Draw(yanivCallingTexture, playersCallingSignVectors[caller], Color.White);
 
                         // Draw caller's cards
-                        if (currentTime <= 2f) {
+                        if (currentTime <= 3f) {
                             for (var i = 1; i < 3; i++) {
                                 var direction = i == 1 ? 1 : -1;
                                 var middle = playersCardsVectors[i].Count % 2 == 0
@@ -330,7 +333,7 @@ namespace YanivUbuntu{
                             }
                         }
 
-                        if (currentTime > 2f) {
+                        if (currentTime > 3f) {
                             if (winner != caller)
                                 spriteBatch.Draw(assafCallingTexture, playersCallingSignVectors[winner], null,
                                     Color.White);
@@ -647,7 +650,11 @@ namespace YanivUbuntu{
                 Name = players[0].PlayerName, Score = players[0].Score,
                 Date = DateTime.Today.ToShortDateString()
             };
-            scoresTable.Add(newScore);
+            if(scoresTable.Count < 4) 
+                scoresTable.Add(newScore);
+            else if (newScore.Score < scoresTable[scoresTable.Count - 1].Score)
+                scoresTable[scoresTable.Count - 1] = newScore;
+            scoresTable.Sort(((score, other) => score.Score - other.Score));
         }
 
         private void UpdatePlayersCardsVectors(int i) {
@@ -663,8 +670,10 @@ namespace YanivUbuntu{
             }
 
             if (i == 0)
-                for (var j = 0; j < players[0].Cards.Count; j++)
-                    players[0].Cards[j].spriteVector = playersCardsVectors[0][j];
+                for (var j = 0; j < players[0].Cards.Count; j++) {
+                    var addition = players[0].Cards.Count % 2 == 0 ? 45 : 0;
+                    players[0].Cards[j].spriteVector = playersCardsVectors[0][j] + Vector2.UnitX * addition;
+                }
 
         }
 
@@ -707,17 +716,13 @@ namespace YanivUbuntu{
             if (cards.Count == 0) return false;
             if (cards.Count == 1) return true;
 
-            var series = true;
-            var sameValue = true;
+            bool series;
+            bool sameValue;
 
             series = CheckSeries(cards).Count >= 3;
-
-            if (cards.Count > 2) {
-                for (var i = 1; i < cards.Count - 1 && sameValue; i++)
-                    if (cards[i].CardValue != cards[i + 1].CardValue)
-                        sameValue = false;
-            } else sameValue = cards[0].CardValue == cards[1].CardValue;
-
+            var value = cards[0].CardValue;
+            sameValue = cards.TrueForAll(card => card.CardValue == value);
+            
             return sameValue ^ series;
         }
 

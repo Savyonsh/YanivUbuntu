@@ -7,7 +7,7 @@ namespace YanivUbuntu{
         // Personal Details
         public string PlayerName { get; set; }
         public int PlayerNumber { get; }
-        public int Score { get; private set; }
+        public int Score { get; set; }
 
         // Game Details
         public List<Card> Cards { get; }
